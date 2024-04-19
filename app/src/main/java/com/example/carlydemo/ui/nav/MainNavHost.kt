@@ -1,11 +1,11 @@
-package com.example.carlydemo.nav
+package com.example.carlydemo.ui.nav
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.carlydemo.carlist.CarListScreen
-import com.example.carlydemo.carselection.CarSelectionScreen
-import com.example.carlydemo.dashboard.DashboardScreen
+import com.example.carlydemo.ui.carlist.CarListScreen
+import com.example.carlydemo.ui.carselection.CarSelectionScreen
+import com.example.carlydemo.ui.dashboard.DashboardScreen
 
 @Composable
 fun MainNavHost() {

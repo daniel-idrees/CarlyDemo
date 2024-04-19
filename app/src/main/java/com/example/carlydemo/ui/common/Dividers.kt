@@ -1,4 +1,4 @@
-package com.example.carlydemo.common
+package com.example.carlydemo.ui.common
 
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package com.example.carlydemo.common
+package com.example.carlydemo.ui.common
 
 import androidx.compose.ui.unit.dp
 

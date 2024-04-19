@@ -1,4 +1,4 @@
-package com.example.carlydemo.nav
+package com.example.carlydemo.ui.nav
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable

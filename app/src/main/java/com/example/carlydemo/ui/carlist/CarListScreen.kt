@@ -1,4 +1,4 @@
-package com.example.carlydemo.carlist
+package com.example.carlydemo.ui.carlist
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -30,11 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.carlydemo.R
-import com.example.carlydemo.common.TopBar
-import com.example.carlydemo.common.spaceL
-import com.example.carlydemo.common.spaceM
-import com.example.carlydemo.common.spaceS
-import com.example.carlydemo.common.spaceXS
+import com.example.carlydemo.ui.common.TopBar
+import com.example.carlydemo.ui.common.spaceL
+import com.example.carlydemo.ui.common.spaceM
+import com.example.carlydemo.ui.common.spaceS
+import com.example.carlydemo.ui.common.spaceXS
 import com.example.carlydemo.domain.model.Car
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight

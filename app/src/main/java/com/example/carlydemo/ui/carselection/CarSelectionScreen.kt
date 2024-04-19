@@ -1,4 +1,4 @@
-package com.example.carlydemo.carselection
+package com.example.carlydemo.ui.carselection
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -32,11 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.carlydemo.R
-import com.example.carlydemo.common.LightHorizontalDivider
-import com.example.carlydemo.common.ProceedButton
-import com.example.carlydemo.common.TopBar
-import com.example.carlydemo.common.spaceS
-import com.example.carlydemo.common.spaceXXS
+import com.example.carlydemo.ui.common.LightHorizontalDivider
+import com.example.carlydemo.ui.common.ProceedButton
+import com.example.carlydemo.ui.common.TopBar
+import com.example.carlydemo.ui.common.spaceS
+import com.example.carlydemo.ui.common.spaceXXS
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark

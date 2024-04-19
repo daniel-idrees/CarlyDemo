@@ -5,7 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.carlydemo.nav.MainNavHost
+import com.example.carlydemo.ui.nav.MainNavHost
 import com.example.carlydemo.ui.theme.CarlyDemoTheme
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.carlydemo.nav
+package com.example.carlydemo.ui.nav
 
 import android.net.Uri
 
