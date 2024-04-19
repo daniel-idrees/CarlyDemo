@@ -13,33 +13,46 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.carlydemo.R
+import com.example.carlydemo.common.DarkHorizontalDivider
+import com.example.carlydemo.common.ProceedButton
+import com.example.carlydemo.common.spaceS
+import com.example.carlydemo.common.spaceXS
+import com.example.carlydemo.domain.model.Car
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
-import com.example.carlydemo.ui.theme.CarlyDemoTheme
 import com.example.carlydemo.ui.theme.FontDark
 import com.example.carlydemo.ui.theme.FontLight
 
 @Composable
 fun DashboardScreen(
+    navigateToCarSelection: () -> Unit,
+    navigateToCarList: () -> Unit
+) {
+    val car = Car("BMW", "3 series", "2018", "Diesel")
+    val isCarSelected = false
+    MainView(car, isCarSelected, navigateToCarSelection, navigateToCarList)
+}
+
+@Composable
+private fun MainView(
+    car: Car? = null,
+    isCarSelected: Boolean = false,
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit
 ) {
@@ -57,16 +70,14 @@ fun DashboardScreen(
                 contentDescription = "",
                 modifier = Modifier
                     .aspectRatio(20f / 6f)
-                    .padding(top = 10.dp),
+                    .padding(top = spaceXS),
                 alignment = Alignment.TopCenter
             )
 
-            val isCarSelected = false
-
-            if (isCarSelected) {
-                WithCarSelectedView(navigateToCarList)
+            if (isCarSelected && car != null) {
+                SelectCarDetailView(car, navigateToCarList)
             } else {
-                NoCarSelectedView(
+                AddButton(
                     modifier = Modifier.weight(1f),
                     navigateToCarSelection
                 )
@@ -76,14 +87,19 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun WithCarSelectedView(navigateToCarList: () -> Unit) {
-    Column(modifier = Modifier.padding(16.dp)) {
+private fun SelectCarDetailView(car: Car, navigateToCarList: () -> Unit) {
+    Column(modifier = Modifier.padding(spaceS)) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "AUDI - A4",
+                text = stringResource(
+                    id = R.string.car_manufacturer_and_brand_series_text,
+                    car.manufacturer,
+                    car.brandSeries
+                ),
                 color = FontLight,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -91,9 +107,8 @@ private fun WithCarSelectedView(navigateToCarList: () -> Unit) {
 
             Image(
                 painter = painterResource(id = R.drawable.switch_car_icon),
-                contentDescription = "",
+                contentDescription = "Switch car icon",
                 modifier = Modifier
-                    .weight(1f)
                     .size(30.dp)
                     .clickable(onClick = navigateToCarList),
                 alignment = Alignment.TopEnd
@@ -102,22 +117,26 @@ private fun WithCarSelectedView(navigateToCarList: () -> Unit) {
 
         Text(
             modifier = Modifier.padding(top = 2.dp),
-            text = "2007 - Gasoline",
+            text = stringResource(
+                id = R.string.car_manufactured_year_and_fuel_type_text,
+                car.manufacturedYear,
+                car.fuelType
+            ),
             color = FontDark,
             fontSize = 14.sp,
         )
         Image(
             painter = painterResource(id = R.drawable.car_image),
-            contentDescription = "",
+            contentDescription = "Car image",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = spaceS)
                 .weight(1f),
             alignment = Alignment.Center
         )
 
         Text(
-            text = "Discover your car",
+            text = stringResource(id = R.string.dashboard_feature_list_header_text),
             color = FontLight,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium
@@ -130,103 +149,17 @@ private fun WithCarSelectedView(navigateToCarList: () -> Unit) {
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(vertical = spaceS)
         ) {
-            Column(
-                modifier = Modifier.padding(vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Diagnostics",
-                        color = FontDark,
-                        fontSize = 14.sp,
-                    )
+            val features = listOf("Diagnostics", "Live Data", "Battery Check")
 
-                    Box(
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clip(CircleShape)
-                            .background(BackgroundDark),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = ">",
-                            color = FontLight,
-                            modifier = Modifier.padding(bottom = 2.dp)
-                        )
-                    }
-                }
+            LazyColumn {
+                items(features.size) { index ->
+                    val feature = features[index]
+                    FeatureListItem(feature, onProceedButtonClick = {})
 
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = BackgroundDark
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Live Data",
-                        color = FontDark,
-                        fontSize = 14.sp,
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clip(CircleShape)
-                            .background(BackgroundDark),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = ">",
-                            color = FontLight,
-                            modifier = Modifier.padding(bottom = 2.dp)
-                        )
-                    }
-
-                }
-
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = BackgroundDark
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Battery Check",
-                        color = FontDark,
-                        fontSize = 14.sp,
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clip(CircleShape)
-                            .background(BackgroundDark),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = ">",
-                            color = FontLight,
-                            modifier = Modifier.padding(bottom = 2.dp)
-                        )
+                    if (index != features.lastIndex) {
+                        DarkHorizontalDivider()
                     }
                 }
             }
@@ -235,7 +168,25 @@ private fun WithCarSelectedView(navigateToCarList: () -> Unit) {
 }
 
 @Composable
-private fun NoCarSelectedView(
+private fun FeatureListItem(text: String, onProceedButtonClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(spaceS),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text,
+            color = FontDark,
+            fontSize = 14.sp,
+        )
+        ProceedButton(onClick = onProceedButtonClick)
+    }
+}
+
+@Composable
+private fun AddButton(
     modifier: Modifier,
     navigateToCarSelection: () -> Unit
 ) {
@@ -252,13 +203,17 @@ private fun NoCarSelectedView(
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DashboardPreview() {
-    CarlyDemoTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            DashboardScreen({}, {})
-        }
+private fun DashboardWithNoSelectionPreview() {
+    MainView(navigateToCarSelection = { }) {
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DashboardWithCarDetailPreview() {
+    MainView(car = Car("BMW", "3 series", "2018", "Diesel"),
+        isCarSelected = true,
+        navigateToCarSelection = { }) {
     }
 }
