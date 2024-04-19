@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">CarlyDemo</string>
+
+    <string name="dashboard_feature_list_header_text">Discover your car</string>
+    <string name="car_list_screen_top_bar_text">Your cars</string>
+
+    <string name="car_manufacturer_and_brand_series_text">%1$s - %2$s</string>
+    <string name="car_manufactured_year_and_fuel_type_text">%1$s - %2$s</string>
+    <string name="car_list_screen_add_new_car_button_text">Add new car</string>
+
+    <string name="car_selection_screen_top_bar_text">Car selection</string>
+    <string name="car_selection_screen_search_brand_text">Search for brand …</string>
+    <string name="car_selection_screen_search_build_year_text">Search for buildyear …</string>
+    <string name="car_selection_screen_search_model_text">Search for model …</string>
+
 </resources>
