@@ -36,6 +36,8 @@ import com.example.carlydemo.ui.common.spaceM
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
 import com.example.carlydemo.domain.model.Car
+import com.example.carlydemo.domain.model.FuelType
+import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark
@@ -49,9 +51,9 @@ fun CarListScreen(
 ) {
 
     val carList = listOf(
-        Car("BMW", "3 series", "2018", "Diesel"),
-        Car("Audi", "A4", "2007", "Gasoline", true),
-        Car("Mercedes", "C class", "2008", "Electric"),
+        SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
+        SelectedCar("Audi", "A4", 2007, FuelType.Gasoline, emptyList(), true),
+        SelectedCar("Mercedes", "C class", 2008, FuelType.Electric, emptyList()),
     )
 
     Scaffold(
@@ -88,11 +90,11 @@ fun CarListScreen(
 }
 
 @Composable
-private fun CarListView(carList: List<Car>) {
+private fun CarListView(selectedCars: List<SelectedCar>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(spaceS)
     ) {
-        items(carList) { car ->
+        items(selectedCars) { car ->
             CarItemView(car, onDeleteClick = {})
         }
     }
@@ -114,13 +116,13 @@ private fun AddNewCarButton(modifier: Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-private fun CarItemView(car: Car, onDeleteClick: () -> Unit) {
+private fun CarItemView(car: SelectedCar, onDeleteClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = spaceS),
         colors = CardDefaults.cardColors(containerColor = BackgroundDark),
-        border = if (car.selected) BorderStroke(1.dp, color = primaryColor) else null
+        border = if (car.isMain) BorderStroke(1.dp, color = primaryColor) else null
     ) {
         Column(
             modifier = Modifier.padding(vertical = spaceXS, horizontal = spaceS),
@@ -134,13 +136,13 @@ private fun CarItemView(car: Car, onDeleteClick: () -> Unit) {
                 Text(
                     text = stringResource(
                         id = R.string.car_manufacturer_and_brand_series_text,
-                        car.manufacturer,
-                        car.brandSeries
+                        car.brand,
+                        car.series
                     ),
                     color = FontLight,
                     fontSize = 16.sp
                 )
-                if (!car.selected) {
+                if (!car.isMain) {
                     Image(
                         modifier = Modifier
                             .size(18.dp)
@@ -154,7 +156,7 @@ private fun CarItemView(car: Car, onDeleteClick: () -> Unit) {
             Text(
                 text = stringResource(
                     id = R.string.car_manufactured_year_and_fuel_type_text,
-                    car.manufacturedYear,
+                    car.buildYear,
                     car.fuelType
                 ),
                 color = FontDark,

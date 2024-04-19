@@ -29,11 +29,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.carlydemo.R
+import com.example.carlydemo.domain.model.FuelType
+import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.common.DarkHorizontalDivider
 import com.example.carlydemo.ui.common.ProceedButton
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
-import com.example.carlydemo.domain.model.Car
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark
@@ -44,14 +45,14 @@ fun DashboardScreen(
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit
 ) {
-    val car = Car("BMW", "3 series", "2018", "Diesel")
+    val car = SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList())
     val isCarSelected = false
     MainView(car, isCarSelected, navigateToCarSelection, navigateToCarList)
 }
 
 @Composable
 private fun MainView(
-    car: Car? = null,
+    car: SelectedCar? = null,
     isCarSelected: Boolean = false,
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit
@@ -87,7 +88,7 @@ private fun MainView(
 }
 
 @Composable
-private fun SelectCarDetailView(car: Car, navigateToCarList: () -> Unit) {
+private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit) {
     Column(modifier = Modifier.padding(spaceS)) {
         Row(
             modifier = Modifier
@@ -97,8 +98,8 @@ private fun SelectCarDetailView(car: Car, navigateToCarList: () -> Unit) {
             Text(
                 text = stringResource(
                     id = R.string.car_manufacturer_and_brand_series_text,
-                    car.manufacturer,
-                    car.brandSeries
+                    car.brand,
+                    car.series
                 ),
                 color = FontLight,
                 fontSize = 24.sp,
@@ -119,7 +120,7 @@ private fun SelectCarDetailView(car: Car, navigateToCarList: () -> Unit) {
             modifier = Modifier.padding(top = 2.dp),
             text = stringResource(
                 id = R.string.car_manufactured_year_and_fuel_type_text,
-                car.manufacturedYear,
+                car.buildYear,
                 car.fuelType
             ),
             color = FontDark,
@@ -212,7 +213,7 @@ private fun DashboardWithNoSelectionPreview() {
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    MainView(car = Car("BMW", "3 series", "2018", "Diesel"),
+    MainView(car = SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
         isCarSelected = true,
         navigateToCarSelection = { }) {
     }

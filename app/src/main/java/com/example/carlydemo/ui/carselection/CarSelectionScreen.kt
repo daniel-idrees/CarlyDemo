@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,13 +31,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.carlydemo.R
+import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.ui.common.LightHorizontalDivider
 import com.example.carlydemo.ui.common.ProceedButton
 import com.example.carlydemo.ui.common.TopBar
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXXS
 import com.example.carlydemo.ui.theme.BackgroundDark
-import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark
 import com.example.carlydemo.ui.theme.primaryColor
 
@@ -111,7 +110,6 @@ private fun SearchButton(onSearchClick: () -> Unit) {
     )
 }
 
-
 @Composable
 private fun BrandSelectionListView(
     items: List<String>,
@@ -132,20 +130,21 @@ private fun SeriesSelectionListView(
 @Composable
 private fun BuildYearSelectionListView(
     header: String,
-    items: List<String>,
+    minSupportedYear: Int,
+    maxSupportedYear: Int,
     onItemClick: () -> Unit
 ) {
-    ListView(header, items, onItemClick)
+    val yearsList = (minSupportedYear..maxSupportedYear).map { it.toString() }
+    ListView(header, yearsList, onItemClick)
 }
 
 
 @Composable
 private fun FuelTypeListView(
     header: String,
-    items: List<String>,
     onItemClick: () -> Unit
 ) {
-    ListView(header, items, onItemClick)
+    ListView(header, FuelType.getList() , onItemClick)
 }
 
 
