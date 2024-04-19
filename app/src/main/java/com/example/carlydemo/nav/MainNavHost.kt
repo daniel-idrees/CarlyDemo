@@ -23,11 +23,14 @@ fun MainNavHost() {
         }
 
         carSelectionScreen {
-            CarSelectionScreen()
+            CarSelectionScreen(goBack = navController::popBackStack)
         }
 
         carListScreen {
-            CarListScreen()
+            CarListScreen(
+                navigateToCarSelection = navController::navigateToCarSelection,
+                goBack = navController::popBackStack
+            )
         }
     }
 }
