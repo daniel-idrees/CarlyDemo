@@ -1,4 +1,4 @@
-package com.example.carlydemo.data.repository
+package com.example.carlydemo.data.repository.source
 
 import android.content.Context
 import com.example.carlydemo.data.dto.CarDto
@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.io.InputStreamReader
 import javax.inject.Inject
+
 
 private const val dataFileName = "vehicle_data.csv"
 
@@ -25,8 +26,7 @@ internal class OpenCSVManagerImpl @Inject constructor(
     override suspend fun readCarData(): List<CarDto> {
         val inputStream = appContext.assets.open(dataFileName)
         val reader = CSVReaderBuilder(InputStreamReader(inputStream)).build()
-        val carListData = reader.toCarListData()
-        return carListData
+        return reader.toCarListData()
     }
 }
 
