@@ -23,9 +23,7 @@ sealed interface CarSelectionUiState {
         val selectedModelYear: String
     ) : CarSelectionUiState
 
-    data class CarSelectionFinished(
-        val selectedCar: SelectedCar
-    ): CarSelectionUiState
+    data object CarSelectionFinished : CarSelectionUiState
 
     data object Error: CarSelectionUiState
 

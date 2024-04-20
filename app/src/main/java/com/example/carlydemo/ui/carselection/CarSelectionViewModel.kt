@@ -38,7 +38,7 @@ class CarSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             carsUseCase.get()
                 .flowOn(Dispatchers.IO)
-                .catch { CarSelectionUiState.Error }
+                .catch { _viewState.update { CarSelectionUiState.Error } }
                 .map { cars ->
                     cars?.let { list ->
                         carList = list
@@ -104,11 +104,7 @@ class CarSelectionViewModel @Inject constructor(
 
         viewModelScope.launch {
             addSelectedCarUseCase.add(selectedCar)
-            _viewState.update {
-                CarSelectionUiState.CarSelectionFinished(
-                    selectedCar
-                )
-            }
+            _viewState.update { CarSelectionUiState.CarSelectionFinished }
         }
     }
 }
