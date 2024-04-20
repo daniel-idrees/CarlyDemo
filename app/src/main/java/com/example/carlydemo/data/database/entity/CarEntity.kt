@@ -9,11 +9,11 @@ import androidx.room.TypeConverters
 import com.example.carlydemo.data.database.util.ListConverter
 import com.example.carlydemo.domain.model.FuelType
 
-@Entity(tableName = "car", indices = [Index(value = ["brand_name"], unique = true)])
+@Entity(tableName = "car", indices = [Index(value = ["brand_name", "series_name"], unique = true)])
 @TypeConverters(ListConverter::class,)
 data class CarEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = null,
+    val id: Long = 0,
     @ColumnInfo(name = "brand_name") val brandName: String,
     @ColumnInfo(name = "series_name") val seriesName: String,
     @ColumnInfo(name = "build_year") val buildYear: Int,
