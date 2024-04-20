@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,17 +26,16 @@ class DashboardViewModel @Inject constructor(
     private var shouldRefreshData = true
 
     fun loadDataIfRequired() {
-        if(shouldRefreshData) {
+        if (shouldRefreshData) {
             _viewState.update { DashboardUiState.Loading }
             viewModelScope.launch {
                 getMainSelectedCarUseCase.get()
                     .flowOn(Dispatchers.IO)
-                    .catch { DashboardUiState.NoCarSelectedState }
-                    .map { car ->
-                        DashboardUiState.CarSelectedState(car)
-                    }.collect { uiState ->
+                    .catch {
+                        _viewState.update { DashboardUiState.NoCarSelectedState }
+                    }.collect { car ->
                         shouldRefreshData = false
-                        _viewState.update { uiState }
+                        _viewState.update { DashboardUiState.CarSelectedState(car) }
                     }
             }
         }

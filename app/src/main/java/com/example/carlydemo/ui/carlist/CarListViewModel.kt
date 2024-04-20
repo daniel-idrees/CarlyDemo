@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +19,7 @@ import javax.inject.Inject
 class CarListViewModel @Inject constructor(
     private val getSelectedCarsUseCase: GetSelectedCarsUseCase,
     private val deleteSelectedCarUseCase: DeleteSelectedCarUseCase
-): ViewModel() {
+) : ViewModel() {
     private val _viewState: MutableStateFlow<CarListUiState> =
         MutableStateFlow(CarListUiState.Loading)
 
@@ -31,13 +30,9 @@ class CarListViewModel @Inject constructor(
         viewModelScope.launch {
             getSelectedCarsUseCase.get()
                 .flowOn(Dispatchers.IO)
-                .catch { CarListUiState.Error }
-                .map { cars ->
-                    cars.let { list ->
-                        CarListUiState.SelectedCars(list)
-                    }
-                }.collect { uiState ->
-                    _viewState.update { uiState }
+                .catch { _viewState.update { CarListUiState.Error } }
+                .collect { cars ->
+                    _viewState.update { CarListUiState.SelectedCars(cars) }
                 }
         }
     }
