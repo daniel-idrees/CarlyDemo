@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -28,11 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.common.DarkHorizontalDivider
-import com.example.carlydemo.ui.common.ProceedButton
+import com.example.carlydemo.ui.common.ProceedIconBox
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
 import com.example.carlydemo.ui.theme.BackgroundDark
@@ -42,18 +44,18 @@ import com.example.carlydemo.ui.theme.FontLight
 
 @Composable
 fun DashboardScreen(
+    viewModel: DashboardViewModel,
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit
 ) {
-    val car = SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList())
-    val isCarSelected = false
-    MainView(car, isCarSelected, navigateToCarSelection, navigateToCarList)
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    MainView(viewState, navigateToCarSelection, navigateToCarList)
 }
 
 @Composable
 private fun MainView(
-    car: SelectedCar? = null,
-    isCarSelected: Boolean = false,
+    viewState: DashboardUiState,
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit
 ) {
@@ -75,8 +77,8 @@ private fun MainView(
                 alignment = Alignment.TopCenter
             )
 
-            if (isCarSelected && car != null) {
-                SelectCarDetailView(car, navigateToCarList)
+            if (viewState is DashboardUiState.CarSelectedState) {
+                SelectCarDetailView(viewState.car, navigateToCarList)
             } else {
                 AddButton(
                     modifier = Modifier.weight(1f),
@@ -157,7 +159,7 @@ private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit)
             LazyColumn {
                 items(features.size) { index ->
                     val feature = features[index]
-                    FeatureListItem(feature, onProceedButtonClick = {})
+                    FeatureListItem(feature, onItemClick = {})
 
                     if (index != features.lastIndex) {
                         DarkHorizontalDivider()
@@ -169,11 +171,12 @@ private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit)
 }
 
 @Composable
-private fun FeatureListItem(text: String, onProceedButtonClick: () -> Unit) {
+private fun FeatureListItem(text: String, onItemClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(spaceS),
+            .padding(spaceS)
+            .clickable(onClick = onItemClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -182,7 +185,7 @@ private fun FeatureListItem(text: String, onProceedButtonClick: () -> Unit) {
             color = FontDark,
             fontSize = 14.sp,
         )
-        ProceedButton(onClick = onProceedButtonClick)
+        ProceedIconBox()
     }
 }
 
@@ -205,7 +208,7 @@ private fun AddButton(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithNoSelectionPreview() {
-    MainView(navigateToCarSelection = { }) {
+    MainView(DashboardUiState.NoCarSelectedState, navigateToCarSelection = { }) {
     }
 }
 
@@ -213,8 +216,15 @@ private fun DashboardWithNoSelectionPreview() {
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    MainView(car = SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
-        isCarSelected = true,
+    MainView(DashboardUiState.CarSelectedState(
+        SelectedCar(
+            "BMW",
+            "3 series",
+            2018,
+            FuelType.Diesel,
+            emptyList()
+        )
+    ),
         navigateToCarSelection = { }) {
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,15 +30,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
+import com.example.carlydemo.domain.model.FuelType
+import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.common.TopBar
 import com.example.carlydemo.ui.common.spaceL
 import com.example.carlydemo.ui.common.spaceM
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
-import com.example.carlydemo.domain.model.Car
-import com.example.carlydemo.domain.model.FuelType
-import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark
@@ -46,16 +47,32 @@ import com.example.carlydemo.ui.theme.primaryColor
 
 @Composable
 fun CarListScreen(
+    viewModel: CarListViewModel,
     navigateToCarSelection: () -> Unit,
     goBack: () -> Unit
 ) {
 
-    val carList = listOf(
-        SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
-        SelectedCar("Audi", "A4", 2007, FuelType.Gasoline, emptyList(), true),
-        SelectedCar("Mercedes", "C class", 2008, FuelType.Electric, emptyList()),
-    )
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
+    if (viewState is CarListUiState.SelectedCars) {
+        MainView(
+            viewState as CarListUiState.SelectedCars,
+            navigateToCarSelection,
+            viewModel::deleteCar,
+            goBack
+        )
+    } else {
+        // TODO loading
+    }
+}
+
+@Composable
+private fun MainView(
+    viewState: CarListUiState.SelectedCars,
+    navigateToCarSelection: () -> Unit,
+    deleteCar: (SelectedCar) -> Unit,
+    goBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopBar(stringResource(id = R.string.car_list_screen_top_bar_text), onBackPress = goBack)
@@ -75,7 +92,7 @@ fun CarListScreen(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
-                CarListView(carList)
+                CarListView(viewState.selectedCars, deleteCar)
 
                 AddNewCarButton(
                     modifier = Modifier
@@ -90,12 +107,12 @@ fun CarListScreen(
 }
 
 @Composable
-private fun CarListView(selectedCars: List<SelectedCar>) {
+private fun CarListView(selectedCars: List<SelectedCar>, deleteCar: (SelectedCar) -> Unit) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(spaceS)
     ) {
         items(selectedCars) { car ->
-            CarItemView(car, onDeleteClick = {})
+            CarItemView(car, onDeleteClick = { deleteCar(car) })
         }
     }
 }
@@ -169,5 +186,11 @@ private fun CarItemView(car: SelectedCar, onDeleteClick: () -> Unit) {
 @Preview
 @Composable
 private fun CarListPreview() {
-    CarListScreen({}, {})
+    MainView(CarListUiState.SelectedCars(
+        listOf(
+            SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
+            SelectedCar("Audi", "A4", 2007, FuelType.Gasoline, emptyList(), true),
+            SelectedCar("Mercedes", "C class", 2008, FuelType.Electric, emptyList()),
+        )
+    ), {}, {}, {})
 }
