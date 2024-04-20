@@ -36,6 +36,7 @@ import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.common.DarkHorizontalDivider
+import com.example.carlydemo.ui.common.Loader
 import com.example.carlydemo.ui.common.ProceedIconBox
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
@@ -93,7 +94,7 @@ private fun MainView(
 
             when (viewState) {
                 is DashboardUiState.Loading -> {
-                    //TODO LOADING
+                    Loader()
                 }
 
                 is DashboardUiState.CarSelectedState -> {

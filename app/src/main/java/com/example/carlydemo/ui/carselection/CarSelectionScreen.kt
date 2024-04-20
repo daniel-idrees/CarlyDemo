@@ -34,7 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
+import com.example.carlydemo.ui.common.ErrorView
 import com.example.carlydemo.ui.common.LightHorizontalDivider
+import com.example.carlydemo.ui.common.Loader
 import com.example.carlydemo.ui.common.ProceedIconBox
 import com.example.carlydemo.ui.common.TopBar
 import com.example.carlydemo.ui.common.spaceS
@@ -124,7 +126,7 @@ private fun MainView(
 
                 when (viewState) {
                     is CarSelectionUiState.CarSelectionFinished -> goBack() //TODO
-                    CarSelectionUiState.Error -> Error()
+                    CarSelectionUiState.Error -> ErrorView()
                     CarSelectionUiState.Loading -> Loader()
                     is CarSelectionUiState.SelectBrand -> {
                         searchBarHint =
@@ -160,7 +162,7 @@ private fun MainView(
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_model_text)
                         FuelTypeListView(
-                            header = (viewState as CarSelectionUiState.SelectFuelType).selectedBrand + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedSeries + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedModelYear,
+                            header = viewState.selectedBrand + ", " + viewState.selectedSeries + ", " + viewState.selectedModelYear,
                             onItemClick = onSelectFuelTypeAction
                         )
                     }
@@ -182,16 +184,6 @@ private fun onBackPressAction(
         is CarSelectionUiState.SelectFuelType -> viewModel.selectSeries(viewState.selectedSeries)
         else -> goBack()
     }
-}
-
-@Composable
-private fun Loader() {
-    //TODO 
-}
-
-@Composable
-private fun Error() {
-    //TODO
 }
 
 @Composable

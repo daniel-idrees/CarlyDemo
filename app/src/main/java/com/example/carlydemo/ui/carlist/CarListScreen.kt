@@ -34,6 +34,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.domain.model.SelectedCar
+import com.example.carlydemo.ui.common.ErrorView
+import com.example.carlydemo.ui.common.Loader
 import com.example.carlydemo.ui.common.TopBar
 import com.example.carlydemo.ui.common.spaceL
 import com.example.carlydemo.ui.common.spaceM
@@ -54,15 +56,16 @@ fun CarListScreen(
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    if (viewState is CarListUiState.SelectedCars) {
-        MainView(
+
+    when(viewState) {
+        is CarListUiState.SelectedCars -> MainView(
             viewState as CarListUiState.SelectedCars,
             navigateToCarSelection,
             viewModel::deleteCar,
             goBack
         )
-    } else {
-        // TODO loading
+        CarListUiState.Error -> ErrorView()
+        CarListUiState.Loading -> Loader()
     }
 }
 
