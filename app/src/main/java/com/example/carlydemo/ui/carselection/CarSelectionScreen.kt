@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.ui.common.LightHorizontalDivider
@@ -42,16 +43,17 @@ import com.example.carlydemo.ui.theme.FontDark
 import com.example.carlydemo.ui.theme.primaryColor
 
 @Composable
-fun CarSelectionScreen(goBack: () -> Unit) {
-    val searchBrandText = stringResource(id = R.string.car_selection_screen_search_brand_text)
-    val searchBuildYearText =
-        stringResource(id = R.string.car_selection_screen_search_build_year_text)
-    val searchModelText = stringResource(id = R.string.car_selection_screen_search_model_text)
+fun CarSelectionScreen(
+    viewModel: CarSelectionViewModel,
+    goBack: () -> Unit
+) {
 
-    //TODO ui state management
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
     var text by rememberSaveable { mutableStateOf("") }
+
+    var searchBarHint by rememberSaveable { mutableStateOf("") }
 
     val onSearchClick = {
         if (text.isNotBlank()) {
@@ -59,11 +61,20 @@ fun CarSelectionScreen(goBack: () -> Unit) {
         }
     }
 
+    val onUpPress = {
+        when(viewState) {
+            is CarSelectionUiState.SelectSeries -> viewModel.initialState()
+            is CarSelectionUiState.SelectYear -> viewModel.selectBrand((viewState as CarSelectionUiState.SelectYear).selectedBrand)
+            is CarSelectionUiState.SelectFuelType -> viewModel.selectSeries((viewState as CarSelectionUiState.SelectFuelType).selectedSeries)
+            else -> goBack()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopBar(
                 stringResource(id = R.string.car_selection_screen_top_bar_text),
-                onBackPress = goBack
+                onBackPress = onUpPress
             )
         }
     ) { contentPadding ->
@@ -85,13 +96,55 @@ fun CarSelectionScreen(goBack: () -> Unit) {
                     onValueChange = { text = it },
                     label = {
                         Text(
-                            text = searchBrandText,
+                            text = searchBarHint,
                             color = FontDark
                         )
                     },
                 )
 
-                BrandSelectionListView(listOf("Audi", "BMW", "Mercedes", "Volkswagen")) {}
+                when (viewState) {
+                    is CarSelectionUiState.CarSelectionFinished -> goBack() //TODO
+                    CarSelectionUiState.Error -> {} //TODO
+                    CarSelectionUiState.Loading -> {} // TODO
+                    is CarSelectionUiState.SelectBrand -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_brand_text)
+                        BrandSelectionListView(
+                            (viewState as CarSelectionUiState.SelectBrand).brands,
+                            onItemClick = viewModel::selectBrand
+                        )
+                    }
+
+                    is CarSelectionUiState.SelectSeries -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_brand_text)
+                        SeriesSelectionListView(
+                            header = (viewState as CarSelectionUiState.SelectSeries).selectedBrand,
+                            items = (viewState as CarSelectionUiState.SelectSeries).series,
+                            onItemClick = viewModel::selectSeries
+                        )
+                    }
+
+                    is CarSelectionUiState.SelectYear -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_build_year_text)
+                        BuildYearSelectionListView(
+                            header = (viewState as CarSelectionUiState.SelectYear).selectedBrand + ", " + (viewState as CarSelectionUiState.SelectYear).selectedSeries,
+                            minSupportedYear = (viewState as CarSelectionUiState.SelectYear).minSupportedYear,
+                            maxSupportedYear = (viewState as CarSelectionUiState.SelectYear).maxSupportedYear,
+                            onItemClick = viewModel::selectModelYear
+                        )
+                    }
+
+                    is CarSelectionUiState.SelectFuelType -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_model_text)
+                        FuelTypeListView(
+                            header = (viewState as CarSelectionUiState.SelectFuelType).selectedBrand + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedSeries + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedModelYear,
+                            onItemClick = viewModel::selectFuelType
+                        )
+                    }
+                }
             }
         }
     }
@@ -113,7 +166,7 @@ private fun SearchButton(onSearchClick: () -> Unit) {
 @Composable
 private fun BrandSelectionListView(
     items: List<String>,
-    onItemClick: () -> Unit
+    onItemClick: (String) -> Unit
 ) {
     ListView(items = items, onItemClick = onItemClick)
 }
@@ -122,7 +175,7 @@ private fun BrandSelectionListView(
 private fun SeriesSelectionListView(
     header: String,
     items: List<String>,
-    onItemClick: () -> Unit
+    onItemClick: (String) -> Unit
 ) {
     ListView(header, items, onItemClick)
 }
@@ -132,7 +185,7 @@ private fun BuildYearSelectionListView(
     header: String,
     minSupportedYear: Int,
     maxSupportedYear: Int,
-    onItemClick: () -> Unit
+    onItemClick: (String) -> Unit
 ) {
     val yearsList = (minSupportedYear..maxSupportedYear).map { it.toString() }
     ListView(header, yearsList, onItemClick)
@@ -142,17 +195,16 @@ private fun BuildYearSelectionListView(
 @Composable
 private fun FuelTypeListView(
     header: String,
-    onItemClick: () -> Unit
+    onItemClick: (String) -> Unit
 ) {
-    ListView(header, FuelType.getList() , onItemClick)
+    ListView(header, FuelType.getList(), onItemClick)
 }
-
 
 @Composable
 private fun ListView(
     header: String = "",
     items: List<String>,
-    onItemClick: () -> Unit
+    onItemClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -173,15 +225,15 @@ private fun ListView(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = spaceS, vertical = spaceXXS),
+                            .padding(horizontal = spaceS, vertical = spaceXXS)
+                            .clickable {
+                                onItemClick(text)
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = text,
-                            modifier = Modifier
-                                .clickable(onClick = onItemClick),
-
                             color = FontDark
                         )
 
@@ -200,5 +252,5 @@ private fun ListView(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarSelectionPreview() {
-    CarSelectionScreen({})
+    //CarSelectionScreen({)
 }
