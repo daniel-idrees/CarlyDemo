@@ -50,10 +50,37 @@ fun CarSelectionScreen(
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
+    val backPressAction = {
+        onBackPressAction(viewState, viewModel, goBack)
+    }
+
+    BackHandler {
+        backPressAction()
+    }
+
+    MainView(
+        viewState = viewState,
+        onUpPress = backPressAction,
+        onBrandSelectAction = viewModel::selectBrand,
+        goBack = goBack,
+        onSelectSeriesAction = viewModel::selectSeries,
+        onSelectModelYearAction = viewModel::selectModelYear,
+        onSelectFuelTypeAction = viewModel::selectFuelType
+    )
+}
+
+@Composable
+private fun MainView(
+    viewState: CarSelectionUiState,
+    onUpPress: () -> Unit,
+    onBrandSelectAction: (String) -> Unit,
+    goBack: () -> Unit,
+    onSelectSeriesAction: (String) -> Unit,
+    onSelectModelYearAction: (String) -> Unit,
+    onSelectFuelTypeAction: (String) -> Unit
+) {
     val focusManager = LocalFocusManager.current
     var text by rememberSaveable { mutableStateOf("") }
-
-    var searchBarHint by rememberSaveable { mutableStateOf("") }
 
     val onSearchClick = {
         if (text.isNotBlank()) {
@@ -61,18 +88,7 @@ fun CarSelectionScreen(
         }
     }
 
-    val onUpPress = {
-        when(viewState) {
-            is CarSelectionUiState.SelectSeries -> viewModel.initialState()
-            is CarSelectionUiState.SelectYear -> viewModel.selectBrand((viewState as CarSelectionUiState.SelectYear).selectedBrand)
-            is CarSelectionUiState.SelectFuelType -> viewModel.selectSeries((viewState as CarSelectionUiState.SelectFuelType).selectedSeries)
-            else -> goBack()
-        }
-    }
-
-    BackHandler {
-        onUpPress()
-    }
+    var searchBarHint by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -108,14 +124,14 @@ fun CarSelectionScreen(
 
                 when (viewState) {
                     is CarSelectionUiState.CarSelectionFinished -> goBack() //TODO
-                    CarSelectionUiState.Error -> {} //TODO
-                    CarSelectionUiState.Loading -> {} // TODO
+                    CarSelectionUiState.Error -> Error()
+                    CarSelectionUiState.Loading -> Loader()
                     is CarSelectionUiState.SelectBrand -> {
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_brand_text)
                         BrandSelectionListView(
-                            (viewState as CarSelectionUiState.SelectBrand).brands,
-                            onItemClick = viewModel::selectBrand
+                            viewState.brands,
+                            onItemClick = onBrandSelectAction
                         )
                     }
 
@@ -123,9 +139,9 @@ fun CarSelectionScreen(
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_brand_text)
                         SeriesSelectionListView(
-                            header = (viewState as CarSelectionUiState.SelectSeries).selectedBrand,
-                            items = (viewState as CarSelectionUiState.SelectSeries).series,
-                            onItemClick = viewModel::selectSeries
+                            header = viewState.selectedBrand,
+                            items = viewState.series,
+                            onItemClick = onSelectSeriesAction
                         )
                     }
 
@@ -133,10 +149,10 @@ fun CarSelectionScreen(
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_build_year_text)
                         BuildYearSelectionListView(
-                            header = (viewState as CarSelectionUiState.SelectYear).selectedBrand + ", " + (viewState as CarSelectionUiState.SelectYear).selectedSeries,
-                            minSupportedYear = (viewState as CarSelectionUiState.SelectYear).minSupportedYear,
-                            maxSupportedYear = (viewState as CarSelectionUiState.SelectYear).maxSupportedYear,
-                            onItemClick = viewModel::selectModelYear
+                            header = viewState.selectedBrand + ", " + viewState.selectedSeries,
+                            minSupportedYear = viewState.minSupportedYear,
+                            maxSupportedYear = viewState.maxSupportedYear,
+                            onItemClick = onSelectModelYearAction
                         )
                     }
 
@@ -145,13 +161,37 @@ fun CarSelectionScreen(
                             stringResource(id = R.string.car_selection_screen_search_model_text)
                         FuelTypeListView(
                             header = (viewState as CarSelectionUiState.SelectFuelType).selectedBrand + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedSeries + ", " + (viewState as CarSelectionUiState.SelectFuelType).selectedModelYear,
-                            onItemClick = viewModel::selectFuelType
+                            onItemClick = onSelectFuelTypeAction
                         )
                     }
                 }
             }
         }
     }
+}
+
+
+private fun onBackPressAction(
+    viewState: CarSelectionUiState,
+    viewModel: CarSelectionViewModel,
+    goBack: () -> Unit
+) {
+    when (viewState) {
+        is CarSelectionUiState.SelectSeries -> viewModel.initialState()
+        is CarSelectionUiState.SelectYear -> viewModel.selectBrand(viewState.selectedBrand)
+        is CarSelectionUiState.SelectFuelType -> viewModel.selectSeries(viewState.selectedSeries)
+        else -> goBack()
+    }
+}
+
+@Composable
+private fun Loader() {
+    //TODO 
+}
+
+@Composable
+private fun Error() {
+    //TODO
 }
 
 @Composable
@@ -255,6 +295,78 @@ private fun ListView(
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun CarSelectionPreview() {
-    //CarSelectionScreen({)
+private fun CarBrandSelectionPreview() {
+    MainView(
+        viewState = CarSelectionUiState.SelectBrand(
+            listOf(
+                "Bmw",
+                "Audi",
+                "Mercedes",
+                "Volkswagen"
+            )
+        ),
+        onUpPress = { },
+        onBrandSelectAction = {},
+        goBack = { },
+        onSelectSeriesAction = {},
+        onSelectModelYearAction = {},
+        onSelectFuelTypeAction = {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CarSeriesSelectionPreview() {
+    MainView(
+        viewState = CarSelectionUiState.SelectSeries(
+            selectedBrand = "Bmw",
+            series = listOf("1 Series", "2 Series", "X1 Series", "X2 Series")
+        ),
+        onUpPress = { },
+        onBrandSelectAction = {},
+        goBack = { },
+        onSelectSeriesAction = {},
+        onSelectModelYearAction = {},
+        onSelectFuelTypeAction = {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CarYearSelectionPreview() {
+    MainView(
+        viewState = CarSelectionUiState.SelectYear(
+            selectedBrand = "Bmw",
+            selectedSeries = "X1 Series",
+            minSupportedYear = 2010,
+            maxSupportedYear = 2023
+        ),
+        onUpPress = { },
+        onBrandSelectAction = {},
+        goBack = { },
+        onSelectSeriesAction = {},
+        onSelectModelYearAction = {},
+        onSelectFuelTypeAction = {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CarFuelTypeSelectionPreview() {
+    MainView(
+        viewState = CarSelectionUiState.SelectFuelType(
+            selectedBrand = "Bmw",
+            selectedSeries = "X1 Series",
+            selectedModelYear = "2023"
+        ),
+        onUpPress = { },
+        onBrandSelectAction = {},
+        goBack = { },
+        onSelectSeriesAction = {},
+        onSelectModelYearAction = {},
+        onSelectFuelTypeAction = {}
+    )
 }
