@@ -18,6 +18,7 @@ fun MainNavHost() {
     ) {
         dashboardScreen {
             DashboardScreen(
+                viewModel = hiltViewModel(),
                 navigateToCarSelection = navController::navigateToCarSelection,
                 navigateToCarList = navController::navigateToCarList
             )
@@ -32,6 +33,7 @@ fun MainNavHost() {
 
         carListScreen {
             CarListScreen(
+                viewModel = hiltViewModel(),
                 navigateToCarSelection = navController::navigateToCarSelection,
                 goBack = navController::navigateUp
             )
