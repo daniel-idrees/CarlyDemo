@@ -19,21 +19,31 @@ class DashboardViewModel @Inject constructor(
     private val getMainSelectedCarUseCase: GetMainSelectedCarUseCase
 ) : ViewModel() {
     private val _viewState: MutableStateFlow<DashboardUiState> =
-        MutableStateFlow(DashboardUiState.NoCarSelectedState)
+        MutableStateFlow(DashboardUiState.Loading)
 
     val viewState: StateFlow<DashboardUiState>
         get() = _viewState
 
-    init {
-        viewModelScope.launch {
-            getMainSelectedCarUseCase.get()
-                .flowOn(Dispatchers.IO)
-                .catch { DashboardUiState.NoCarSelectedState }
-                .map { car ->
-                    DashboardUiState.CarSelectedState(car)
-                }.collect { uiState ->
-                    _viewState.update { uiState }
-                }
+    private var shouldRefreshData = true
+
+    fun loadDataIfRequired() {
+        if(shouldRefreshData) {
+            _viewState.update { DashboardUiState.Loading }
+            viewModelScope.launch {
+                getMainSelectedCarUseCase.get()
+                    .flowOn(Dispatchers.IO)
+                    .catch { DashboardUiState.NoCarSelectedState }
+                    .map { car ->
+                        DashboardUiState.CarSelectedState(car)
+                    }.collect { uiState ->
+                        shouldRefreshData = false
+                        _viewState.update { uiState }
+                    }
+            }
         }
+    }
+
+    fun triggerTheDataLoadInNextResumption() {
+        shouldRefreshData = true
     }
 }
