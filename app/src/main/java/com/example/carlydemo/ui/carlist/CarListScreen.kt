@@ -188,9 +188,28 @@ private fun CarItemView(car: SelectedCar, onDeleteClick: () -> Unit) {
 private fun CarListPreview() {
     MainView(CarListUiState.SelectedCars(
         listOf(
-            SelectedCar("BMW", "3 series", 2018, FuelType.Diesel, emptyList()),
-            SelectedCar("Audi", "A4", 2007, FuelType.Gasoline, emptyList(), true),
-            SelectedCar("Mercedes", "C class", 2008, FuelType.Electric, emptyList()),
+            SelectedCar(
+                brand = "BMW",
+                series = "3 series",
+                buildYear = 2018,
+                fuelType = FuelType.Diesel,
+                features = emptyList()
+            ),
+            SelectedCar(
+                brand = "Audi",
+                series = "A4",
+                buildYear = 2007,
+                fuelType = FuelType.Gasoline,
+                features = emptyList(),
+                isMain = true
+            ),
+            SelectedCar(
+                brand = "Mercedes",
+                series = "C class",
+                buildYear = 2008,
+                fuelType = FuelType.Electric,
+                features = emptyList()
+            ),
         )
     ), {}, {}, {})
 }

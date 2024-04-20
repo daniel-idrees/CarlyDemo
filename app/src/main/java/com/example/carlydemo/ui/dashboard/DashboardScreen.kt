@@ -218,6 +218,7 @@ private fun DashboardWithNoSelectionPreview() {
 private fun DashboardWithCarDetailPreview() {
     MainView(DashboardUiState.CarSelectedState(
         SelectedCar(
+            null,
             "BMW",
             "3 series",
             2018,
