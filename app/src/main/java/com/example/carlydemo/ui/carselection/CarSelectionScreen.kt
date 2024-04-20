@@ -1,6 +1,7 @@
 package com.example.carlydemo.ui.carselection
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,7 +48,6 @@ fun CarSelectionScreen(
     viewModel: CarSelectionViewModel,
     goBack: () -> Unit
 ) {
-
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
@@ -68,6 +68,10 @@ fun CarSelectionScreen(
             is CarSelectionUiState.SelectFuelType -> viewModel.selectSeries((viewState as CarSelectionUiState.SelectFuelType).selectedSeries)
             else -> goBack()
         }
+    }
+
+    BackHandler {
+        onUpPress()
     }
 
     Scaffold(
