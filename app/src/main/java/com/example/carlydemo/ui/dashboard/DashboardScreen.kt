@@ -29,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
@@ -50,7 +52,19 @@ fun DashboardScreen(
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    MainView(viewState, navigateToCarSelection, navigateToCarList)
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.loadDataIfRequired()
+    }
+
+    MainView(viewState,
+        {
+            viewModel.triggerTheDataLoadInNextResumption()
+            navigateToCarSelection()
+        },
+        {
+            viewModel.triggerTheDataLoadInNextResumption()
+            navigateToCarList()
+        })
 }
 
 @Composable
@@ -77,13 +91,21 @@ private fun MainView(
                 alignment = Alignment.TopCenter
             )
 
-            if (viewState is DashboardUiState.CarSelectedState) {
-                SelectCarDetailView(viewState.car, navigateToCarList)
-            } else {
-                AddButton(
-                    modifier = Modifier.weight(1f),
-                    navigateToCarSelection
-                )
+            when (viewState) {
+                is DashboardUiState.Loading -> {
+                    //TODO LOADING
+                }
+
+                is DashboardUiState.CarSelectedState -> {
+                    SelectCarDetailView(viewState.car, navigateToCarList)
+                }
+
+                else -> {
+                    AddButton(
+                        modifier = Modifier.weight(1f),
+                        navigateToCarSelection
+                    )
+                }
             }
         }
     }
