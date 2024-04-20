@@ -20,10 +20,8 @@ internal object DbModule {
     ): AppDatabase = Room.databaseBuilder(
         context,
         AppDatabase::class.java,
-        "car_database"
+        carDatabaseName
     ).build()
-
-    @Singleton
-    @Provides
-    fun provideCarDao(db: AppDatabase) = db.carDao()
 }
+
+private const val carDatabaseName = "car_database"

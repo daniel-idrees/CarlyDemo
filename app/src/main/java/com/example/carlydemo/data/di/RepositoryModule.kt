@@ -1,7 +1,7 @@
 package com.example.carlydemo.data.di
 
-import com.example.carlydemo.data.repository.source.OpenCSVManager
-import com.example.carlydemo.data.repository.source.OpenCSVManagerImpl
+import com.example.carlydemo.data.repository.CarRepositoryImpl
+import com.example.carlydemo.domain.repository.CarRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,11 +10,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal interface DataModule {
+internal interface RepositoryModule {
 
     @Binds
     @Singleton
-    fun providesOpenCSVManager(
-        impl: OpenCSVManagerImpl,
-    ): OpenCSVManager
+    fun providesCarRepository(
+        impl: CarRepositoryImpl,
+    ): CarRepository
 }
