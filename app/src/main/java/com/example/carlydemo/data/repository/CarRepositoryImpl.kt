@@ -9,7 +9,7 @@ import javax.inject.Inject
 internal class CarRepositoryImpl @Inject constructor(
     private val openCSVManager: OpenCSVManager
 ) : CarRepository {
-    override fun getCars(): List<Car>? {
+    override suspend fun getCars(): List<Car>? {
         return try {
             val cars = openCSVManager.readCarData().toCarList()
             cars

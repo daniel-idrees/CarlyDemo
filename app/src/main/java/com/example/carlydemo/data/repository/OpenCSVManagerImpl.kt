@@ -22,7 +22,7 @@ internal class OpenCSVManagerImpl @Inject constructor(
     private val appContext: Context
 ) : OpenCSVManager {
     @Throws(IOException::class)
-    override fun readCarData(): List<CarDto> {
+    override suspend fun readCarData(): List<CarDto> {
         val inputStream = appContext.assets.open(dataFileName)
         val reader = CSVReaderBuilder(InputStreamReader(inputStream)).build()
         val carListData = reader.toCarListData()
