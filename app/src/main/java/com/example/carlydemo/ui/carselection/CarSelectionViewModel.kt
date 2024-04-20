@@ -100,5 +100,7 @@ class CarSelectionViewModel @Inject constructor(
                 )
             )
         }
+
+        //TODO to save this car in DB
     }
 }
