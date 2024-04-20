@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.carlydemo.R
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.ui.common.LightHorizontalDivider
-import com.example.carlydemo.ui.common.ProceedButton
+import com.example.carlydemo.ui.common.ProceedIconBox
 import com.example.carlydemo.ui.common.TopBar
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXXS
@@ -237,7 +237,7 @@ private fun ListView(
                             color = FontDark
                         )
 
-                        ProceedButton {}
+                        ProceedIconBox()
                     }
 
                     LightHorizontalDivider()
