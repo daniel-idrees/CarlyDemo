@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.carlydemo.domain.model.Car
 import com.example.carlydemo.domain.model.FuelType
 import com.example.carlydemo.domain.model.SelectedCar
+import com.example.carlydemo.domain.usecase.AddSelectedCarUseCase
 import com.example.carlydemo.domain.usecase.GetCarsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CarSelectionViewModel @Inject constructor(
-    carsUseCase: GetCarsUseCase
+    carsUseCase: GetCarsUseCase,
+    private val addSelectedCarUseCase: AddSelectedCarUseCase
 ) : ViewModel() {
     private lateinit var carList: List<Car>
     private var selectedBrand = ""
@@ -35,10 +38,11 @@ class CarSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             carsUseCase.get()
                 .flowOn(Dispatchers.IO)
+                .catch { CarSelectionUiState.Error }
                 .map { cars ->
-                    cars?.let { item ->
-                        carList = item
-                        CarSelectionUiState.SelectBrand(item.map { it.brand }.distinct())
+                    cars?.let { list ->
+                        carList = list
+                        CarSelectionUiState.SelectBrand(list.getBrands())
                     } ?: CarSelectionUiState.Error
                 }.collect { uiState ->
                     _viewState.update { uiState }
@@ -48,7 +52,7 @@ class CarSelectionViewModel @Inject constructor(
 
     fun initialState() {
         _viewState.update {
-            CarSelectionUiState.SelectBrand(carList.map { it.brand }.distinct())
+            CarSelectionUiState.SelectBrand(carList.getBrands())
         }
     }
 
@@ -57,13 +61,14 @@ class CarSelectionViewModel @Inject constructor(
         _viewState.update {
             CarSelectionUiState.SelectSeries(
                 brand,
-                carList.filter { it.brand == selectedBrand }.map { it.series })
+                carList.getSeriesForBrand(selectedBrand)
+            )
         }
     }
 
     fun selectSeries(series: String) {
         selectedSeries = series
-        val car = carList.first { it.brand == selectedBrand && it.series == selectedSeries }
+        val car = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
         _viewState.update {
             CarSelectionUiState.SelectYear(
                 selectedBrand,
@@ -88,19 +93,30 @@ class CarSelectionViewModel @Inject constructor(
     fun selectFuelType(fuelType: String) {
         selectedFuelType = FuelType.valueOf(fuelType)
         val car = carList.first { it.brand == selectedBrand && it.series == selectedSeries }
-        _viewState.update {
-            CarSelectionUiState.CarSelectionFinished(
-                SelectedCar(
-                    brand = selectedBrand,
-                    series = selectedSeries,
-                    buildYear = selectedModelYear.toInt(),
-                    fuelType = FuelType.valueOf(fuelType),
-                    features = car.features,
-                    isMain = true
-                )
-            )
-        }
+        val selectedCar = SelectedCar(
+            brand = selectedBrand,
+            series = selectedSeries,
+            buildYear = selectedModelYear.toInt(),
+            fuelType = FuelType.valueOf(fuelType),
+            features = car.features,
+            isMain = true
+        )
 
-        //TODO to save this car in DB
+        viewModelScope.launch {
+            addSelectedCarUseCase.add(selectedCar)
+            _viewState.update {
+                CarSelectionUiState.CarSelectionFinished(
+                    selectedCar
+                )
+            }
+        }
     }
 }
+
+private fun List<Car>.getBrands(): List<String> = map { it.brand }.distinct()
+
+private fun List<Car>.getSeriesForBrand(brand: String): List<String> =
+    filter { it.brand == brand }.map { it.series }
+
+private fun List<Car>.getCarForBrandAndSeries(brand: String, series: String): Car =
+    first { it.brand == brand && it.series == series }
