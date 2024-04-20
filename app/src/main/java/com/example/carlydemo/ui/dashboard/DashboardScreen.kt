@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -38,8 +39,10 @@ import com.example.carlydemo.domain.model.SelectedCar
 import com.example.carlydemo.ui.common.DarkHorizontalDivider
 import com.example.carlydemo.ui.common.Loader
 import com.example.carlydemo.ui.common.ProceedIconBox
+import com.example.carlydemo.ui.common.spaceM
 import com.example.carlydemo.ui.common.spaceS
 import com.example.carlydemo.ui.common.spaceXS
+import com.example.carlydemo.ui.common.spaceXXS
 import com.example.carlydemo.ui.theme.BackgroundDark
 import com.example.carlydemo.ui.theme.BackgroundLight
 import com.example.carlydemo.ui.theme.FontDark
@@ -114,78 +117,86 @@ private fun MainView(
 
 @Composable
 private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit) {
-    Column(modifier = Modifier.padding(spaceS)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(
-                    id = R.string.car_manufacturer_and_brand_series_text,
-                    car.brand,
-                    car.series
-                ),
-                color = FontLight,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.switch_car_icon),
-                contentDescription = "Switch car icon",
+    Column(
+        modifier = Modifier
+            .padding(spaceS)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Row(
                 modifier = Modifier
-                    .size(30.dp)
-                    .clickable(onClick = navigateToCarList),
-                alignment = Alignment.TopEnd
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(
+                        id = R.string.car_manufacturer_and_brand_series_text,
+                        car.brand,
+                        car.series
+                    ),
+                    color = FontLight,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.switch_car_icon),
+                    contentDescription = "Switch car icon",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable(onClick = navigateToCarList),
+                    alignment = Alignment.TopEnd
+                )
+            }
+
+            Text(
+                modifier = Modifier.padding(top = 2.dp),
+                text = stringResource(
+                    id = R.string.car_manufactured_year_and_fuel_type_text,
+                    car.buildYear,
+                    car.fuelType
+                ),
+                color = FontDark,
+                fontSize = 14.sp,
             )
         }
-
-        Text(
-            modifier = Modifier.padding(top = 2.dp),
-            text = stringResource(
-                id = R.string.car_manufactured_year_and_fuel_type_text,
-                car.buildYear,
-                car.fuelType
-            ),
-            color = FontDark,
-            fontSize = 14.sp,
-        )
         Image(
             painter = painterResource(id = R.drawable.car_image),
             contentDescription = "Car image",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = spaceS)
-                .weight(1f),
+                .padding(vertical = spaceXXS)
+                .size(150.dp),
             alignment = Alignment.Center
         )
 
-        Text(
-            text = stringResource(id = R.string.dashboard_feature_list_header_text),
-            color = FontLight,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Column {
+            Text(
+                text = stringResource(id = R.string.dashboard_feature_list_header_text),
+                color = FontLight,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium
+            )
 
-        ElevatedCard(
-            elevation = CardDefaults.elevatedCardElevation(1.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = BackgroundLight,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = spaceS)
-        ) {
-            val features = listOf("Diagnostics", "Live Data", "Battery Check")
+            ElevatedCard(
+                elevation = CardDefaults.elevatedCardElevation(1.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = BackgroundLight,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spaceS)
+            ) {
+                val features = car.features
+                LazyColumn {
+                    items(features.size) { index ->
+                        val feature = features[index]
+                        FeatureListItem(feature, onItemClick = {})
 
-            LazyColumn {
-                items(features.size) { index ->
-                    val feature = features[index]
-                    FeatureListItem(feature, onItemClick = {})
-
-                    if (index != features.lastIndex) {
-                        DarkHorizontalDivider()
+                        if (index != features.lastIndex) {
+                            DarkHorizontalDivider()
+                        }
                     }
                 }
             }
@@ -198,7 +209,7 @@ private fun FeatureListItem(text: String, onItemClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(spaceS)
+            .padding(horizontal = spaceS, vertical = spaceXXS)
             .clickable(onClick = onItemClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -246,7 +257,7 @@ private fun DashboardWithCarDetailPreview() {
             "3 series",
             2018,
             FuelType.Diesel,
-            emptyList()
+            listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
         )
     ),
         navigateToCarSelection = { }) {
