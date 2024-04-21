@@ -9,6 +9,5 @@ import javax.inject.Inject
 class GetSelectedCarsUseCase @Inject constructor(
     private val carRepository: CarRepository
 ) {
-    suspend fun get() =
-        carRepository.getSelectedCars().map { entities -> entities.map(CarEntity::toSelectedCar) }
+    fun get() = carRepository.getSelectedCars().map { entities -> entities.map(CarEntity::toSelectedCar) }
 }

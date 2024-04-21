@@ -24,7 +24,8 @@ internal class CarRepositoryImpl @Inject constructor(
             emptyList()
         }
     }
-    override suspend fun getSelectedCars(): Flow<List<CarEntity>> = dao.getCars()
+
+    override fun getSelectedCars(): Flow<List<CarEntity>> = dao.getCars()
 
     override fun getMainSelectedCar(): Flow<CarEntity?> = dao.getMainSelectedCar()
 
