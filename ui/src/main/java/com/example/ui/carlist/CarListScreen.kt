@@ -22,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,14 +56,20 @@ internal fun CarListScreen(
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(viewModel.events) {
+        viewModel.events.collect { event ->
+            when (event) {
+                CarListUiEvent.NavigateToCarSelection -> navigateToCarSelection()
+                CarListUiEvent.goBack -> goBack()
+            }
+        }
+    }
 
     when (viewState) {
         is CarListUiState.SelectedCars -> MainView(
             viewState = viewState as CarListUiState.SelectedCars,
             navigateToCarSelection = navigateToCarSelection,
-            setCarAsMain = viewModel::setCarAsMain,
-            deleteCar = viewModel::deleteCar,
-            goBack = goBack
+            onAction = viewModel::onAction,
         )
 
         CarListUiState.Error -> ErrorView()
@@ -74,13 +81,13 @@ internal fun CarListScreen(
 private fun MainView(
     viewState: CarListUiState.SelectedCars,
     navigateToCarSelection: () -> Unit,
-    setCarAsMain: (Long?) -> Unit,
-    deleteCar: (SelectedCar) -> Unit,
-    goBack: () -> Unit
+    onAction: (CarListAction) -> Unit,
 ) {
     Scaffold(
         topBar = {
-            TopBar(stringResource(id = R.string.car_list_screen_top_bar_text), onBackPress = goBack)
+            TopBar(
+                stringResource(id = R.string.car_list_screen_top_bar_text),
+                onBackPress = { onAction(CarListAction.UpPressed) })
         }
     ) { contentPadding ->
         Box(
@@ -100,8 +107,7 @@ private fun MainView(
                 CarListView(
                     modifier = Modifier.weight(1f),
                     viewState.selectedCars,
-                    setCarAsMain,
-                    deleteCar
+                    onAction
                 )
                 Row(
                     modifier = Modifier.weight(0.12f),
@@ -122,10 +128,9 @@ private fun MainView(
 
 @Composable
 private fun CarListView(
-    modifier : Modifier,
+    modifier: Modifier,
     selectedCars: List<SelectedCar>,
-    setCarAsMain: (Long?) -> Unit,
-    deleteCar: (SelectedCar) -> Unit
+    onAction: (CarListAction) -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -134,8 +139,8 @@ private fun CarListView(
         items(selectedCars) { car ->
             CarItemView(
                 car,
-                onCardClick = setCarAsMain,
-                onDeleteClick = { deleteCar(car) })
+                onCardClick = { onAction(CarListAction.CarItemClicked(car)) },
+                onDeleteClick = { onAction(CarListAction.DeleteIconClicked(car)) })
         }
     }
 }
@@ -242,5 +247,5 @@ private fun CarListPreview() {
                     features = emptyList()
                 ),
             )
-        ), {}, {}, {}, {})
+        ), {}, {})
 }
