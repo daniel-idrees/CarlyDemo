@@ -29,11 +29,6 @@ android {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-    generateStubs = true
-}
-
 dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
