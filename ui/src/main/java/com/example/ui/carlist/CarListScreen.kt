@@ -38,7 +38,6 @@ import com.example.ui.common.ErrorView
 import com.example.ui.common.Loader
 import com.example.ui.common.TopBar
 import com.example.ui.common.spaceL
-import com.example.ui.common.spaceM
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
 import com.example.ui.theme.BackgroundDark
@@ -94,23 +93,28 @@ private fun MainView(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(vertical = spaceM),
+                    .padding(top = spaceS),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
                 CarListView(
+                    modifier = Modifier.weight(1f),
                     viewState.selectedCars,
                     setCarAsMain,
                     deleteCar
                 )
-
-                AddNewCarButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = spaceL),
-                    onClick = navigateToCarSelection
-                )
+                Row(
+                    modifier = Modifier.weight(0.12f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    AddNewCarButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = spaceL, end = spaceL),
+                        onClick = navigateToCarSelection
+                    )
+                }
             }
         }
     }
@@ -118,11 +122,13 @@ private fun MainView(
 
 @Composable
 private fun CarListView(
+    modifier : Modifier,
     selectedCars: List<SelectedCar>,
     setCarAsMain: (Long?) -> Unit,
     deleteCar: (SelectedCar) -> Unit
 ) {
     LazyColumn(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(spaceS)
     ) {
         items(selectedCars) { car ->
