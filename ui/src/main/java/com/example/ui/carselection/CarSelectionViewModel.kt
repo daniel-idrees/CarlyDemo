@@ -41,17 +41,22 @@ class CarSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             carsUseCase.get()
                 .flowOn(ioDispatcher)
-                .catch { _viewState.update { CarSelectionUiState.Error } }
-                .map { cars ->
-                    cars?.let { list ->
-                        carList = list
-                        CarSelectionUiState.SelectBrand(list.getBrands())
-                    } ?: CarSelectionUiState.Error
-                }.collect { uiState ->
+                .catch {
+                    _viewState.update { CarSelectionUiState.Error }
+                }.map(::mapCarsListResultToUiState)
+                .collect { uiState ->
                     _viewState.update { uiState }
                 }
         }
     }
+
+    private fun mapCarsListResultToUiState(cars: List<Car>): CarSelectionUiState =
+        if (cars.isNotEmpty()) {
+            carList = cars
+            CarSelectionUiState.SelectBrand(cars.getBrands())
+        } else {
+            CarSelectionUiState.Error
+        }
 
     fun initialState() {
         _viewState.update {
