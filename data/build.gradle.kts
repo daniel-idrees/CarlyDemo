@@ -22,11 +22,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-
     implementation(libs.androidx.core.ktx)
 
-    implementation (libs.hilt.android)
+    implementation(libs.hilt.android)
     kapt(libs.androidx.hilt.hilt.compiler)
     kapt(libs.hilt.compiler)
 

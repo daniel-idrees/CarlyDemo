@@ -1,6 +1,6 @@
 package com.example.data.dto
 
-internal data class CarDto(
+data class CarDto(
     val brandName: String,
     val seriesName: String,
     val minimumSupportedYear: Int,

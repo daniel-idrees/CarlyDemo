@@ -22,6 +22,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":data"))
+    implementation(project(":core"))
+
     implementation (libs.hilt.android)
     kapt(libs.androidx.hilt.hilt.compiler)
     kapt(libs.hilt.compiler)

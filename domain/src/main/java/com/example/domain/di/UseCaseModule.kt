@@ -1,6 +1,7 @@
 package com.example.domain.di
 
-import com.example.domain.repository.CarRepository
+import com.example.core.di.DefaultDispatcher
+import com.example.data.repository.CarRepository
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.DeleteSelectedCarUseCase
 import com.example.domain.usecase.GetCarsUseCase
@@ -11,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 
 @Module
 @InstallIn(ViewModelComponent::class)

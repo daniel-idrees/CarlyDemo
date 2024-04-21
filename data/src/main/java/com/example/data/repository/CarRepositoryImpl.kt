@@ -2,16 +2,10 @@ package com.example.data.repository
 
 import com.example.data.database.dao.CarDao
 import com.example.data.database.entity.CarEntity
-import com.example.data.database.entity.mapper.asEntity
-import com.example.data.database.entity.mapper.toSelectedCar
 import com.example.data.dto.CarDto
-import com.example.data.dto.mapper.toCar
 import com.example.data.repository.source.OpenCSVManager
-import com.example.domain.model.Car
-import com.example.domain.model.SelectedCar
-import com.example.domain.repository.CarRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
 
@@ -20,30 +14,26 @@ internal class CarRepositoryImpl @Inject constructor(
     private val dao: CarDao
 ) : CarRepository {
 
-    override suspend fun getCars(): List<Car>? {
+    override suspend fun getCars(): List<CarDto> {
         return try {
-            val cars = openCSVManager.readCarData().map(CarDto::toCar)
+            val cars = openCSVManager.readCarData()
             cars
         } catch (e: IOException) {
-            null
+            emptyList()
+        } catch (e: FileNotFoundException) {
+            emptyList()
         }
     }
+    override suspend fun getSelectedCars(): Flow<List<CarEntity>> = dao.getCars()
 
-    override suspend fun getSelectedCars(): Flow<List<SelectedCar>> {
-        val cars = dao.getCars()
+    override suspend fun getMainSelectedCar(): Flow<CarEntity> = dao.getMainSelectedCar()
 
-        return cars.map { entities -> entities.map(CarEntity::toSelectedCar) }
-    }
-
-    override suspend fun getMainSelectedCar(): Flow<SelectedCar> =
-        dao.getMainSelectedCar().map { it.toSelectedCar() }
-
-    override suspend fun addSelectedCar(selectedCar: SelectedCar) {
+    override suspend fun addSelectedCar(car: CarEntity) {
         dao.updateAllCarAsNonMain()
-        dao.insertCar(selectedCar.asEntity())
+        dao.insertCar(car)
     }
 
-    override suspend fun deleteSelectedCar(selectedCar: SelectedCar) {
-        dao.deleteCar(selectedCar.id)
+    override suspend fun deleteSelectedCar(car: CarEntity) {
+        dao.deleteCar(car.id)
     }
 }

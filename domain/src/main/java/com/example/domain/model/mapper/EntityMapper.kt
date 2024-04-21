@@ -1,6 +1,7 @@
-package com.example.data.database.entity.mapper
+package com.example.domain.model.mapper
 
 import com.example.data.database.entity.CarEntity
+import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 
 internal fun CarEntity.toSelectedCar(): SelectedCar =
@@ -9,7 +10,7 @@ internal fun CarEntity.toSelectedCar(): SelectedCar =
         brandName,
         seriesName,
         buildYear,
-        fuelType,
+        FuelType.valueOf(fuelType),
         supportedFeatures,
         isSelectedAsMain
     )
@@ -20,6 +21,6 @@ internal fun SelectedCar.asEntity() =
         seriesName = series,
         buildYear = buildYear,
         supportedFeatures = features,
-        fuelType = fuelType,
+        fuelType = fuelType.name,
         isSelectedAsMain = isMain
     )
