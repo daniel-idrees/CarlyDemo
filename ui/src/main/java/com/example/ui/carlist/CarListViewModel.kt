@@ -29,30 +29,24 @@ class CarListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            loadCars()
+            carListUseCaseProvider.getSelectedCarsUseCase.get()
+                .flowOn(ioDispatcher)
+                .catch { _viewState.update { CarListUiState.Error } }
+                .collect { cars ->
+                    _viewState.update { CarListUiState.SelectedCars(cars) }
+                }
         }
-    }
-
-    private suspend fun loadCars() {
-        carListUseCaseProvider.getSelectedCarsUseCase.get()
-            .flowOn(ioDispatcher)
-            .catch { _viewState.update { CarListUiState.Error } }
-            .collect { cars ->
-                _viewState.update { CarListUiState.SelectedCars(cars) }
-            }
     }
 
     fun deleteCar(car: SelectedCar) {
         viewModelScope.launch {
             carListUseCaseProvider.deleteSelectedCarUseCase.delete(car)
-            loadCars()
         }
     }
 
     fun setCarAsMain(id: Long?) {
         viewModelScope.launch {
             carListUseCaseProvider.setCarAsMainUseCase.set(id)
-            loadCars()
         }
     }
 }
