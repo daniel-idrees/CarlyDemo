@@ -7,7 +7,7 @@ import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.BackgroundLight
 
 @Composable
-fun LightHorizontalDivider() {
+internal fun LightHorizontalDivider() {
     HorizontalDivider(
         thickness = 1.dp,
         color = BackgroundLight

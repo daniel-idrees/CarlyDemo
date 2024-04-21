@@ -46,7 +46,7 @@ import com.example.ui.theme.FontDark
 import com.example.ui.theme.primaryColor
 
 @Composable
-fun CarSelectionScreen(
+internal fun CarSelectionScreen(
     viewModel: CarSelectionViewModel,
     goBack: () -> Unit
 ) {

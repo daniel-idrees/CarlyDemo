@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 import com.example.ui.theme.FontLight
 
 @Composable
-fun TopBar(titleText: String, onBackPress: () -> Unit) {
+internal fun TopBar(titleText: String, onBackPress: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -48,7 +48,7 @@ import com.example.ui.theme.FontDark
 import com.example.ui.theme.FontLight
 
 @Composable
-fun DashboardScreen(
+internal fun DashboardScreen(
     viewModel: DashboardViewModel,
     navigateToCarSelection: () -> Unit,
     navigateToCarList: () -> Unit

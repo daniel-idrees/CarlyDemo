@@ -2,8 +2,8 @@ package com.example.ui.common
 
 import androidx.compose.ui.unit.dp
 
-val spaceXXS = 8.dp
-val spaceXS = 10.dp
-val spaceS = 16.dp
-val spaceM = 24.dp
-val spaceL = 32.dp
+internal val spaceXXS = 8.dp
+internal val spaceXS = 10.dp
+internal val spaceS = 16.dp
+internal val spaceM = 24.dp
+internal val spaceL = 32.dp

@@ -48,7 +48,7 @@ import com.example.ui.theme.FontLight
 import com.example.ui.theme.primaryColor
 
 @Composable
-fun CarListScreen(
+internal fun CarListScreen(
     viewModel: CarListViewModel,
     navigateToCarSelection: () -> Unit,
     goBack: () -> Unit

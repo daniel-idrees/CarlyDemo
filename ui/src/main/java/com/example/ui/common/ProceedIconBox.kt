@@ -15,7 +15,7 @@ import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.FontLight
 
 @Composable
-fun ProceedIconBox() {
+internal fun ProceedIconBox() {
     Box(
         modifier = Modifier
             .size(25.dp)

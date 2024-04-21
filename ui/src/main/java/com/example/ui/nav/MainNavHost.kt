@@ -7,9 +7,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ui.carlist.CarListScreen
 import com.example.ui.carselection.CarSelectionScreen
 import com.example.ui.dashboard.DashboardScreen
+import com.example.ui.nav.Screen.DashboardScreen
 
 @Composable
-fun MainNavHost() {
+internal fun MainNavHost() {
     val navController = rememberNavController()
 
     NavHost(

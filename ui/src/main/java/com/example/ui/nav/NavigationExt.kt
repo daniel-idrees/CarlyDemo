@@ -7,17 +7,20 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import com.example.ui.nav.Screen.CarListScreen
+import com.example.ui.nav.Screen.CarSelectionScreen
+import com.example.ui.nav.Screen.DashboardScreen
 
-const val DASHBOARD_ROUTE = "dashboard"
-const val CAR_LIST_ROUTE = "carList"
-const val CAR_SELECTION_ROUTE = "carSelection"
+internal const val DASHBOARD_ROUTE = "dashboard"
+internal const val CAR_LIST_ROUTE = "carList"
+internal const val CAR_SELECTION_ROUTE = "carSelection"
 
-fun NavGraphBuilder.dashboardScreen(
+internal fun NavGraphBuilder.dashboardScreen(
     content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) = composable(DashboardScreen.route, content = content)
 
 
-fun NavController.navigateToDashboard() {
+internal fun NavController.navigateToDashboard() {
     this.navigate(
         DashboardScreen.route,
         navOptions {
@@ -26,11 +29,11 @@ fun NavController.navigateToDashboard() {
     )
 }
 
-fun NavGraphBuilder.carListScreen(
+internal fun NavGraphBuilder.carListScreen(
     content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) = composable(CarListScreen.route, content = content)
 
-fun NavController.navigateToCarList() {
+internal fun NavController.navigateToCarList() {
     this.navigate(
         CarListScreen.route,
         navOptions {
@@ -39,11 +42,11 @@ fun NavController.navigateToCarList() {
     )
 }
 
-fun NavGraphBuilder.carSelectionScreen(
+internal fun NavGraphBuilder.carSelectionScreen(
     content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) = composable(CarSelectionScreen.route, content = content)
 
-fun NavController.navigateToCarSelection() {
+internal fun NavController.navigateToCarSelection() {
     this.navigate(
         CarSelectionScreen.route,
         navOptions {
