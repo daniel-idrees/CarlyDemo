@@ -1,20 +1,20 @@
 package com.example.ui.carselection
 
 sealed interface CarSelectionUiState {
-    data class SelectBrand(val brands: List<String>) : CarSelectionUiState
-    data class SelectSeries(
+    data class BrandSelection(val brandsToSelect: List<String>) : CarSelectionUiState
+    data class SeriesSelection(
         val selectedBrand: String,
-        val series: List<String>
+        val seriesToSelect: List<String>
     ) : CarSelectionUiState
 
-    data class SelectYear(
+    data class BuildYearSelection(
         val selectedBrand: String,
         val selectedSeries: String,
-        val minSupportedYear: Int,
-        val maxSupportedYear: Int
+        val minSupportedYearForSelected: Int,
+        val maxSupportedYearForSelected: Int
     ) : CarSelectionUiState
 
-    data class SelectFuelType(
+    data class FuelTypeSelection(
         val selectedBrand: String,
         val selectedSeries: String,
         val selectedModelYear: String
