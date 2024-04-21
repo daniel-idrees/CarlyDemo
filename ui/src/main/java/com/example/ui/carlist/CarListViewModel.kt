@@ -34,7 +34,7 @@ class CarListViewModel @Inject constructor(
 
     fun deleteCar(car: SelectedCar) {
         viewModelScope.launch {
-            carListUseCaseProvider.deleteSelectedCarUseCase.delete(car).
+            carListUseCaseProvider.deleteSelectedCarUseCase.delete(car)
         }
     }
 
