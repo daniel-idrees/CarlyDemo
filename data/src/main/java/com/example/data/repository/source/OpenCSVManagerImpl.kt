@@ -42,20 +42,20 @@ private fun CSVReader.toCarListData(): List<CarDto> {
     while (readNext().also { nextLine = it } != null) {
         nextLine?.let { row ->
 
-            if(row[com.example.data.repository.source.BRAND_NAME_INDEX].isNotBlank()) {
-                lastBrandName = row[com.example.data.repository.source.BRAND_NAME_INDEX]
+            if(row[BRAND_NAME_INDEX].isNotBlank()) {
+                lastBrandName = row[BRAND_NAME_INDEX]
             }
 
-            if(row[com.example.data.repository.source.FEATURES_INDEX].isNotBlank()) {
-                lastBrandFeatures = row[com.example.data.repository.source.FEATURES_INDEX].split("\n")
+            if(row[FEATURES_INDEX].isNotBlank()) {
+                lastBrandFeatures = row[FEATURES_INDEX].split("\n")
             }
 
             cars.add(
                 CarDto(
                     brandName = lastBrandName,
-                    seriesName = row[com.example.data.repository.source.BRAND_SERIES_INDEX],
-                    minimumSupportedYear = row[com.example.data.repository.source.MIN_SUPPORTED_YEAR_INDEX].toInt(),
-                    maximumSupportedYear = row[com.example.data.repository.source.MAX_SUPPORTED_YEAR_INDEX].toInt(),
+                    seriesName = row[BRAND_SERIES_INDEX],
+                    minimumSupportedYear = row[MIN_SUPPORTED_YEAR_INDEX].toInt(),
+                    maximumSupportedYear = row[MAX_SUPPORTED_YEAR_INDEX].toInt(),
                     supportedFeatures = lastBrandFeatures,
                 )
             )
