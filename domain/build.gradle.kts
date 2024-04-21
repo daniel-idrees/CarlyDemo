@@ -22,10 +22,7 @@ android {
 }
 
 dependencies {
-
     implementation (libs.hilt.android)
-
-    //kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.hilt.compiler)
     kapt(libs.hilt.compiler)
 

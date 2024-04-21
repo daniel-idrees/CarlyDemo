@@ -24,19 +24,19 @@ android {
 dependencies {
     implementation(project(":domain"))
 
+    implementation(libs.androidx.core.ktx)
+
     implementation (libs.hilt.android)
-    //kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.hilt.compiler)
     kapt(libs.hilt.compiler)
 
-
-    implementation(libs.androidx.core.ktx)
-
     implementation(libs.opencsv)
+
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
 
     implementation(libs.gson)
+
     testImplementation(libs.junit)
 }
