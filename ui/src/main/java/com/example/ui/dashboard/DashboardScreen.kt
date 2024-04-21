@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,18 +54,34 @@ internal fun DashboardScreen(
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(viewModel.events) {
+        viewModel.events.collect { event ->
+            when (event) {
+                DashboardUiEvent.NavigateToCarList -> {
+                    navigateToCarList()
+                }
+
+                DashboardUiEvent.NavigateToCarSelection -> {
+                    navigateToCarSelection()
+                }
+
+                DashboardUiEvent.NavigateToFeatureScreen -> {
+                    // no-op
+                }
+            }
+        }
+    }
+
     MainView(
         viewState,
-        navigateToCarSelection = navigateToCarSelection,
-        navigateToCarList = navigateToCarList
+        viewModel::onAction,
     )
 }
 
 @Composable
 private fun MainView(
     viewState: DashboardUiState,
-    navigateToCarSelection: () -> Unit,
-    navigateToCarList: () -> Unit
+    onAction: (DashboardAction) -> Unit,
 ) {
     Box(modifier = Modifier.background(color = BackgroundDark)) {
         Column(
@@ -90,13 +107,13 @@ private fun MainView(
                 }
 
                 is DashboardUiState.CarSelectedState -> {
-                    SelectCarDetailView(viewState.car, navigateToCarList)
+                    CarDetailView(viewState.car, onAction)
                 }
 
                 else -> {
                     AddButton(
                         modifier = Modifier.weight(1f),
-                        navigateToCarSelection
+                        onButtonClick = { onAction(DashboardAction.AddButtonClicked) }
                     )
                 }
             }
@@ -105,7 +122,10 @@ private fun MainView(
 }
 
 @Composable
-private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit) {
+private fun CarDetailView(
+    car: SelectedCar,
+    onAction: (DashboardAction) -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(spaceS)
@@ -134,7 +154,9 @@ private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit)
                     contentDescription = "Switch car icon",
                     modifier = Modifier
                         .size(30.dp)
-                        .clickable(onClick = navigateToCarList),
+                        .clickable {
+                            onAction(DashboardAction.SwitchCarIconClicked)
+                        },
                     alignment = Alignment.TopEnd
                 )
             }
@@ -181,7 +203,9 @@ private fun SelectCarDetailView(car: SelectedCar, navigateToCarList: () -> Unit)
                 LazyColumn {
                     items(features.size) { index ->
                         val feature = features[index]
-                        FeatureListItem(feature, onItemClick = {})
+                        FeatureListItem(feature, onItemClick = {
+                            onAction(DashboardAction.FeatureItemClicked)
+                        })
 
                         if (index != features.lastIndex) {
                             DarkHorizontalDivider()
@@ -215,7 +239,7 @@ private fun FeatureListItem(text: String, onItemClick: () -> Unit) {
 @Composable
 private fun AddButton(
     modifier: Modifier,
-    navigateToCarSelection: () -> Unit
+    onButtonClick: () -> Unit
 ) {
     Image(
         painter = painterResource(id = R.drawable.add_car_icon),
@@ -223,7 +247,7 @@ private fun AddButton(
         alpha = 0.7f,
         modifier = modifier
             .aspectRatio(20f / 5f)
-            .clickable(onClick = navigateToCarSelection)
+            .clickable(onClick = onButtonClick)
     )
 }
 
@@ -231,8 +255,7 @@ private fun AddButton(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithNoSelectionPreview() {
-    MainView(DashboardUiState.NoCarSelectedState, navigateToCarSelection = { }) {
-    }
+    MainView(DashboardUiState.NoCarSelectedState) { }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -249,7 +272,6 @@ private fun DashboardWithCarDetailPreview() {
                 FuelType.Diesel,
                 listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
             )
-        ),
-        navigateToCarSelection = { }) {
-    }
+        )
+    ) {}
 }
