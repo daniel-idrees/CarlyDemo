@@ -11,7 +11,7 @@ import com.example.data.database.util.ListConverter
 @TypeConverters(ListConverter::class)
 data class CarEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Long? = 0,
     @ColumnInfo(name = "brand_name") val brandName: String,
     @ColumnInfo(name = "series_name") val seriesName: String,
     @ColumnInfo(name = "build_year") val buildYear: Int,

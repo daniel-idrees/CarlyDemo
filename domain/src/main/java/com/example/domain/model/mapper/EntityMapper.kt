@@ -17,6 +17,7 @@ internal fun CarEntity.toSelectedCar(): SelectedCar =
 
 internal fun SelectedCar.asEntity() =
     CarEntity(
+        id = id,
         brandName = brand,
         seriesName = series,
         buildYear = buildYear,
