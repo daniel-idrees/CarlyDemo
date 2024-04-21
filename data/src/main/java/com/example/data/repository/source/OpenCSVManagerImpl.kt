@@ -26,7 +26,9 @@ internal class OpenCSVManagerImpl @Inject constructor(
     override suspend fun readCarData(): List<CarDto> {
         val inputStream = appContext.assets.open(dataFileName)
         val reader = CSVReaderBuilder(InputStreamReader(inputStream)).build()
-        return reader.toCarListData()
+        val cars = reader.toCarListData()
+        reader.close()
+        return cars
     }
 }
 
@@ -42,11 +44,11 @@ private fun CSVReader.toCarListData(): List<CarDto> {
     while (readNext().also { nextLine = it } != null) {
         nextLine?.let { row ->
 
-            if(row[BRAND_NAME_INDEX].isNotBlank()) {
+            if (row[BRAND_NAME_INDEX].isNotBlank()) {
                 lastBrandName = row[BRAND_NAME_INDEX]
             }
 
-            if(row[FEATURES_INDEX].isNotBlank()) {
+            if (row[FEATURES_INDEX].isNotBlank()) {
                 lastBrandFeatures = row[FEATURES_INDEX].split("\n")
             }
 
