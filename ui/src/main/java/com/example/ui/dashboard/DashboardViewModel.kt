@@ -6,7 +6,6 @@ import com.example.core.di.IoDispatcher
 import com.example.domain.usecase.GetMainSelectedCarUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -27,25 +26,18 @@ class DashboardViewModel @Inject constructor(
     val viewState: StateFlow<DashboardUiState>
         get() = _viewState
 
-    private var shouldRefreshData = true
-
-    fun loadDataIfRequired() {
-        if (shouldRefreshData) {
-            _viewState.update { DashboardUiState.Loading }
-            viewModelScope.launch {
-                getMainSelectedCarUseCase.get()
-                    .flowOn(ioDispatcher)
-                    .catch {
-                        _viewState.update { DashboardUiState.NoCarSelectedState }
-                    }.collect { car ->
-                        shouldRefreshData = false
+    init {
+        _viewState.update { DashboardUiState.Loading }
+        viewModelScope.launch {
+            getMainSelectedCarUseCase.get()
+                .flowOn(ioDispatcher)
+                .catch {
+                    _viewState.update { DashboardUiState.NoCarSelectedState }
+                }.collect {
+                    it?.let { car ->
                         _viewState.update { DashboardUiState.CarSelectedState(car) }
-                    }
-            }
+                    } ?: _viewState.update { DashboardUiState.NoCarSelectedState }
+                }
         }
-    }
-
-    fun triggerTheDataLoadInNextResumption() {
-        shouldRefreshData = true
     }
 }

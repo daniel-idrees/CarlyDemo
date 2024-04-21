@@ -30,8 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
@@ -55,19 +53,11 @@ internal fun DashboardScreen(
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.loadDataIfRequired()
-    }
-
-    MainView(viewState,
-        {
-            viewModel.triggerTheDataLoadInNextResumption()
-            navigateToCarSelection()
-        },
-        {
-            viewModel.triggerTheDataLoadInNextResumption()
-            navigateToCarList()
-        })
+    MainView(
+        viewState,
+        navigateToCarSelection = navigateToCarSelection,
+        navigateToCarList = navigateToCarList
+    )
 }
 
 @Composable
