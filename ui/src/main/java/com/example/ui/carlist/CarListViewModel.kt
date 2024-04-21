@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.di.IoDispatcher
 import com.example.domain.model.SelectedCar
-import com.example.domain.usecase.DeleteSelectedCarUseCase
-import com.example.domain.usecase.GetSelectedCarsUseCase
-import com.example.domain.usecase.SetCarAsMainUseCase
+import com.example.domain.usecase.provider.CarListUseCaseProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,9 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CarListViewModel @Inject constructor(
-    private val getSelectedCarsUseCase: GetSelectedCarsUseCase,
-    private val deleteSelectedCarUseCase: DeleteSelectedCarUseCase,
-    private val setCarAsMainUseCase: SetCarAsMainUseCase,
+    private val carListUseCaseProvider: CarListUseCaseProvider,
     @IoDispatcher
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -38,7 +34,7 @@ class CarListViewModel @Inject constructor(
     }
 
     private suspend fun loadCars() {
-        getSelectedCarsUseCase.get()
+        carListUseCaseProvider.getSelectedCarsUseCase.get()
             .flowOn(ioDispatcher)
             .catch { _viewState.update { CarListUiState.Error } }
             .collect { cars ->
@@ -48,13 +44,14 @@ class CarListViewModel @Inject constructor(
 
     fun deleteCar(car: SelectedCar) {
         viewModelScope.launch {
-            deleteSelectedCarUseCase.delete(car)
+            carListUseCaseProvider.deleteSelectedCarUseCase.delete(car)
+            loadCars()
         }
     }
 
     fun setCarAsMain(id: Long?) {
         viewModelScope.launch {
-            setCarAsMainUseCase.set(id)
+            carListUseCaseProvider.setCarAsMainUseCase.set(id)
             loadCars()
         }
     }
