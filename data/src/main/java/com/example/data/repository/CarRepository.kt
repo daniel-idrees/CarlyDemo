@@ -5,7 +5,7 @@ import com.example.data.dto.CarDto
 import kotlinx.coroutines.flow.Flow
 
 interface CarRepository {
-    suspend fun getCars(): List<CarDto>
+    suspend fun getCars(): Flow<List<CarDto>>
     fun getSelectedCars(): Flow<List<CarEntity>>
     fun getMainSelectedCar(): Flow<CarEntity?>
 

@@ -7,9 +7,9 @@ import com.opencsv.CSVReader
 import com.opencsv.CSVReaderBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import java.io.FileNotFoundException
-import java.io.IOException
 import java.io.InputStreamReader
 import javax.inject.Inject
 
@@ -26,16 +26,18 @@ internal class OpenCSVManagerImpl @Inject constructor(
     @ApplicationContext
     private val appContext: Context,
     @IoDispatcher
-    private val coroutineDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : OpenCSVManager {
-    @Throws(IOException::class, FileNotFoundException::class)
-    override suspend fun readCarData(): List<CarDto> =
-        withContext(coroutineDispatcher) {
-            val inputStream = appContext.assets.open(dataFileName)
-            val reader = CSVReaderBuilder(InputStreamReader(inputStream)).build()
-            val cars = reader.toCarListData()
-            reader.close()
-            cars
+
+    override suspend fun readCarData(): Flow<List<CarDto>> =
+        withContext(ioDispatcher) {
+            flow {
+                val inputStream = appContext.assets.open(dataFileName)
+                val reader = CSVReaderBuilder(InputStreamReader(inputStream)).build()
+                val cars = reader.toCarListData()
+                reader.close()
+                emit(cars)
+            }
         }
 }
 

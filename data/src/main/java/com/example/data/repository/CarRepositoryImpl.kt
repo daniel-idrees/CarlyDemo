@@ -14,16 +14,7 @@ internal class CarRepositoryImpl @Inject constructor(
     private val dao: CarDao
 ) : CarRepository {
 
-    override suspend fun getCars(): List<CarDto> {
-        return try {
-            val cars = openCSVManager.readCarData()
-            cars
-        } catch (e: IOException) {
-            emptyList()
-        } catch (e: FileNotFoundException) {
-            emptyList()
-        }
-    }
+    override suspend fun getCars(): Flow<List<CarDto>> = openCSVManager.readCarData()
 
     override fun getSelectedCars(): Flow<List<CarEntity>> = dao.getCars()
 

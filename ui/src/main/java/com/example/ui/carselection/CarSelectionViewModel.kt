@@ -11,8 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,8 +38,9 @@ class CarSelectionViewModel @Inject constructor(
             getCarsUseCase.get()
                 .catch {
                     _viewState.update { CarSelectionUiState.Error }
-                }.map(::mapCarsListResultToUiState)
-                .collectLatest { uiState ->
+                }.distinctUntilChanged()
+                .mapLatest(::mapCarsListResultToUiState)
+                .collect { uiState ->
                     _viewState.update { uiState }
                 }
         }
