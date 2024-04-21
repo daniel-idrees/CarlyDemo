@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.12"
     }
     packaging {
         resources {
@@ -51,13 +51,15 @@ android {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
 dependencies {
+    implementation(project(":ui"))
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":core"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -67,13 +69,15 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation (libs.androidx.hilt.navigation.compose)
-    implementation(libs.opencsv)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    
+
     implementation(libs.androidx.lifecycle.runtime.compose)
-    kapt(libs.hilt.android.compiler)
-    implementation(libs.gson)
+
+
+    //kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.hilt.compiler)
+    kapt(libs.hilt.compiler)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
