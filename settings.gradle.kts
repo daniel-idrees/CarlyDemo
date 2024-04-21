@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "CarlyDemo"
 include(":app")
- 
+include(":core")
+include(":data")
+include(":domain")
+include(":ui")
