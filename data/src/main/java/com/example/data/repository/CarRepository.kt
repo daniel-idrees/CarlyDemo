@@ -11,4 +11,5 @@ interface CarRepository {
 
     suspend fun addSelectedCar(car: CarEntity)
     suspend fun deleteSelectedCar(car: CarEntity)
+    suspend fun setCarAsMain(id: Long?)
 }

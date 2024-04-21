@@ -36,4 +36,9 @@ internal class CarRepositoryImpl @Inject constructor(
     override suspend fun deleteSelectedCar(car: CarEntity) {
         dao.deleteCar(car.id)
     }
+
+    override suspend fun setCarAsMain(id: Long?) {
+        dao.updateAllCarAsNonMain()
+        dao.updateCarAsMain(id)
+    }
 }

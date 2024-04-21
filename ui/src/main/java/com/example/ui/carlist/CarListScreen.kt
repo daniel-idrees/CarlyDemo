@@ -59,10 +59,11 @@ internal fun CarListScreen(
 
     when (viewState) {
         is CarListUiState.SelectedCars -> MainView(
-            viewState as CarListUiState.SelectedCars,
-            navigateToCarSelection,
-            viewModel::deleteCar,
-            goBack
+            viewState = viewState as CarListUiState.SelectedCars,
+            navigateToCarSelection = navigateToCarSelection,
+            setCarAsMain = viewModel::setCarAsMain,
+            deleteCar = viewModel::deleteCar,
+            goBack = goBack
         )
 
         CarListUiState.Error -> ErrorView()
@@ -74,6 +75,7 @@ internal fun CarListScreen(
 private fun MainView(
     viewState: CarListUiState.SelectedCars,
     navigateToCarSelection: () -> Unit,
+    setCarAsMain: (Long?) -> Unit,
     deleteCar: (SelectedCar) -> Unit,
     goBack: () -> Unit
 ) {
@@ -96,7 +98,11 @@ private fun MainView(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
-                CarListView(viewState.selectedCars, deleteCar)
+                CarListView(
+                    viewState.selectedCars,
+                    setCarAsMain,
+                    deleteCar
+                )
 
                 AddNewCarButton(
                     modifier = Modifier
@@ -111,12 +117,19 @@ private fun MainView(
 }
 
 @Composable
-private fun CarListView(selectedCars: List<SelectedCar>, deleteCar: (SelectedCar) -> Unit) {
+private fun CarListView(
+    selectedCars: List<SelectedCar>,
+    setCarAsMain: (Long?) -> Unit,
+    deleteCar: (SelectedCar) -> Unit
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(spaceS)
     ) {
         items(selectedCars) { car ->
-            CarItemView(car, onDeleteClick = { deleteCar(car) })
+            CarItemView(
+                car,
+                onCardClick = setCarAsMain,
+                onDeleteClick = { deleteCar(car) })
         }
     }
 }
@@ -137,11 +150,18 @@ private fun AddNewCarButton(modifier: Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-private fun CarItemView(car: SelectedCar, onDeleteClick: () -> Unit) {
+private fun CarItemView(
+    car: SelectedCar,
+    onCardClick: (Long?) -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = spaceS),
+            .padding(horizontal = spaceS)
+            .clickable {
+                onCardClick(car.id)
+            },
         colors = CardDefaults.cardColors(containerColor = BackgroundDark),
         border = if (car.isMain) BorderStroke(1.dp, color = primaryColor) else null
     ) {
@@ -216,5 +236,5 @@ private fun CarListPreview() {
                     features = emptyList()
                 ),
             )
-        ), {}, {}, {})
+        ), {}, {}, {}, {})
 }
