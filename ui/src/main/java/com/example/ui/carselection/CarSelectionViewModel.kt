@@ -2,18 +2,16 @@ package com.example.ui.carselection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.di.IoDispatcher
 import com.example.domain.model.Car
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.GetCarsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,10 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CarSelectionViewModel @Inject constructor(
-    carsUseCase: GetCarsUseCase,
+    getCarsUseCase: GetCarsUseCase,
     private val addSelectedCarUseCase: AddSelectedCarUseCase,
-    @IoDispatcher
-    private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private lateinit var carList: List<Car>
     private var selectedBrand = ""
@@ -39,12 +35,11 @@ class CarSelectionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            carsUseCase.get()
-                .flowOn(ioDispatcher)
+            getCarsUseCase.get()
                 .catch {
                     _viewState.update { CarSelectionUiState.Error }
                 }.map(::mapCarsListResultToUiState)
-                .collect { uiState ->
+                .collectLatest { uiState ->
                     _viewState.update { uiState }
                 }
         }
