@@ -54,6 +54,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.kotest.runner.junit5)
+    testImplementation (libs.kotest.assertions.core)
+    testImplementation (libs.kotest.property)
+    testImplementation(libs.turbine)
+
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
