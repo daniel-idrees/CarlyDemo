@@ -3,10 +3,8 @@ package com.example.ui.carselection
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,7 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,8 +42,7 @@ import com.example.ui.common.ProceedIconBox
 import com.example.ui.common.TopBar
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXXS
-import com.example.ui.theme.BackgroundDark
-import com.example.ui.theme.BackgroundLight
+import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontDark
 import com.example.ui.theme.MyTypography
 import com.example.ui.theme.primaryColor
@@ -100,6 +97,7 @@ private fun MainView(
     var searchBarHint by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 stringResource(id = R.string.car_selection_screen_top_bar_text),
@@ -107,125 +105,122 @@ private fun MainView(
             )
         }
     ) { contentPadding ->
-        Box(
+        Column(
             modifier = Modifier
-                .background(brush = Brush.verticalGradient(listOf(BackgroundLight, BackgroundDark)))
-                .padding(contentPadding)
+                .fillMaxSize()
+                .padding(contentPadding),
         ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = spaceS, end = spaceS),
+                trailingIcon = {
+                    SearchButton {
+                        focusManager.clearFocus()
+                        onAction(CarSelectionAction.SearchAction(searchBarText))
+                    }
+                },
+                value = searchBarText,
+                singleLine = true,
+                onValueChange = {
+                    searchBarText = it
+                },
+                textStyle = TextStyle(color = FontDark),
+                label = {
+                    Text(
+                        text = searchBarHint,
+                        style = MyTypography.bodyMedium,
+                    )
+                },
+            )
+
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(top = spaceS)
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = spaceS, end = spaceS),
-                    trailingIcon = {
-                        SearchButton {
-                            focusManager.clearFocus()
-                            onAction(CarSelectionAction.SearchAction(searchBarText))
-                        }
-                    },
-                    value = searchBarText,
-                    singleLine = true,
-                    onValueChange = {
-                        searchBarText = it
-                    },
-                    textStyle = TextStyle(color = FontDark),
-                    label = {
-                        Text(
-                            text = searchBarHint,
-                            style =  MyTypography.bodyMedium,
-                        )
-                    },
+                Text(
+                    text = headerText,
+                    modifier = Modifier.padding(horizontal = spaceS, vertical = spaceXXS),
+                    color = primaryColor,
+                    style = MyTypography.bodyMedium
                 )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(top = spaceS)
-                ) {
-                    Text(
-                        text = headerText,
-                        modifier = Modifier.padding(horizontal = spaceS, vertical = spaceXXS),
-                        color = primaryColor,
-                        style =  MyTypography.bodyMedium
-                    )
+                DoubleHorizontalDivider()
 
-                    DoubleHorizontalDivider()
+                when (viewState) {
+                    CarSelectionUiState.Error -> ErrorView()
+                    CarSelectionUiState.Loading -> Loader()
+                    is CarSelectionUiState.BrandSelection -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_brand_text)
 
-                    when (viewState) {
-                        CarSelectionUiState.Error -> ErrorView()
-                        CarSelectionUiState.Loading -> Loader()
-                        is CarSelectionUiState.BrandSelection -> {
-                            searchBarHint =
-                                stringResource(id = R.string.car_selection_screen_search_brand_text)
-
-                            ListView(
-                                items = viewState.brandsToSelect,
-                                onItemClick = { brand ->
-                                    focusManager.clearFocus()
-                                    searchBarText = ""
-                                    onAction(
-                                        CarSelectionAction.OnBrandSelected(
-                                            brand
-                                        )
+                        ListView(
+                            items = viewState.brandsToSelect,
+                            onItemClick = { brand ->
+                                focusManager.clearFocus()
+                                searchBarText = ""
+                                onAction(
+                                    CarSelectionAction.OnBrandSelected(
+                                        brand
                                     )
-                                })
-                        }
+                                )
+                            })
+                    }
 
-                        is CarSelectionUiState.SeriesSelection -> {
-                            searchBarHint =
-                                stringResource(id = R.string.car_selection_screen_search_brand_text)
-                            ListView(
-                                items = viewState.seriesToSelect,
-                                onItemClick = { series ->
-                                    focusManager.clearFocus()
-                                    searchBarText = ""
-                                    onAction(
-                                        CarSelectionAction.OnSeriesSelected(
-                                            series
-                                        )
+                    is CarSelectionUiState.SeriesSelection -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_brand_text)
+                        ListView(
+                            items = viewState.seriesToSelect,
+                            onItemClick = { series ->
+                                focusManager.clearFocus()
+                                searchBarText = ""
+                                onAction(
+                                    CarSelectionAction.OnSeriesSelected(
+                                        series
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
+                    }
 
-                        is CarSelectionUiState.BuildYearSelection -> {
-                            searchBarHint =
-                                stringResource(id = R.string.car_selection_screen_search_build_year_text)
-                            ListView(
-                                items = viewState.buildYearsToSelect,
-                                onItemClick = { modelYear ->
-                                    focusManager.clearFocus()
-                                    searchBarText = ""
-                                    onAction(
-                                        CarSelectionAction.OnBuildYearSelected(
-                                            modelYear
-                                        )
+                    is CarSelectionUiState.BuildYearSelection -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_build_year_text)
+                        ListView(
+                            items = viewState.buildYearsToSelect,
+                            onItemClick = { modelYear ->
+                                focusManager.clearFocus()
+                                searchBarText = ""
+                                onAction(
+                                    CarSelectionAction.OnBuildYearSelected(
+                                        modelYear
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
+                    }
 
-                        is CarSelectionUiState.FuelTypeSelection -> {
-                            searchBarHint =
-                                stringResource(id = R.string.car_selection_screen_search_model_text)
-                            ListView(
-                                viewState.fuelTypes,
-                                onItemClick = { fuelType ->
-                                    focusManager.clearFocus()
-                                    searchBarText = ""
-                                    onAction(
-                                        CarSelectionAction.OnFuelTypeSelected(
-                                            fuelType
-                                        )
+                    is CarSelectionUiState.FuelTypeSelection -> {
+                        searchBarHint =
+                            stringResource(id = R.string.car_selection_screen_search_model_text)
+                        ListView(
+                            viewState.fuelTypes,
+                            onItemClick = { fuelType ->
+                                focusManager.clearFocus()
+                                searchBarText = ""
+                                onAction(
+                                    CarSelectionAction.OnFuelTypeSelected(
+                                        fuelType
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
                     }
                 }
             }
+
         }
     }
 }
@@ -263,7 +258,7 @@ private fun ListView(
                 ) {
                     Text(
                         text = text,
-                        style =  MyTypography.bodyMedium
+                        style = MyTypography.bodyMedium
                     )
                     ProceedIconBox()
                 }
@@ -278,57 +273,65 @@ private fun ListView(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarBrandSelectionPreview() {
-    MainView(
-        viewState = CarSelectionUiState.BrandSelection(
-            listOf(
-                "Bmw",
-                "Audi",
-                "Mercedes",
-                "Volkswagen"
-            )
-        ),
-        headerText = ""
-    ) {}
+    CarlyDemoTheme {
+        MainView(
+            viewState = CarSelectionUiState.BrandSelection(
+                listOf(
+                    "Bmw",
+                    "Audi",
+                    "Mercedes",
+                    "Volkswagen"
+                )
+            ),
+            headerText = ""
+        ) {}
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarSeriesSelectionPreview() {
-    MainView(
-        viewState = CarSelectionUiState.SeriesSelection(
-            selectedBrand = "Bmw",
-            seriesToSelect = listOf("1 Series", "2 Series", "X1 Series", "X2 Series")
-        ),
-        headerText = "Bmw"
-    ) {}
+    CarlyDemoTheme {
+        MainView(
+            viewState = CarSelectionUiState.SeriesSelection(
+                selectedBrand = "Bmw",
+                seriesToSelect = listOf("1 Series", "2 Series", "X1 Series", "X2 Series")
+            ),
+            headerText = "Bmw"
+        ) {}
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarYearSelectionPreview() {
-    MainView(
-        viewState = CarSelectionUiState.BuildYearSelection(
-            selectedBrand = "Bmw",
-            selectedSeries = "X1 Series",
-            buildYearsToSelect = (1998..2010).map { it.toString() }
-        ),
-        headerText = "Bmw, X1 Series"
-    ) {}
+    CarlyDemoTheme {
+        MainView(
+            viewState = CarSelectionUiState.BuildYearSelection(
+                selectedBrand = "Bmw",
+                selectedSeries = "X1 Series",
+                buildYearsToSelect = (1998..2010).map { it.toString() }
+            ),
+            headerText = "Bmw, X1 Series"
+        ) {}
+    }
 }
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarFuelTypeSelectionPreview() {
-    MainView(
-        viewState = CarSelectionUiState.FuelTypeSelection(
-            selectedBrand = "Bmw",
-            selectedSeries = "X1 Series",
-            selectedModelYear = "2023",
-            FuelType.getList()
-        ),
-        headerText = "Bmw, X1 Series, 2023"
-    ) {}
+    CarlyDemoTheme {
+        MainView(
+            viewState = CarSelectionUiState.FuelTypeSelection(
+                selectedBrand = "Bmw",
+                selectedSeries = "X1 Series",
+                selectedModelYear = "2023",
+                FuelType.getList()
+            ),
+            headerText = "Bmw, X1 Series, 2023"
+        ) {}
+    }
 }

@@ -1,21 +1,12 @@
 package com.example.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.example.ui.nav.MainNavHost
 import com.example.ui.theme.CarlyDemoTheme
 
 @Composable
 fun CarlyDemoApp() {
     CarlyDemoTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            MainNavHost()
-        }
+        MainNavHost()
     }
 }

@@ -43,6 +43,7 @@ import com.example.ui.common.spaceXS
 import com.example.ui.common.spaceXXS
 import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.BackgroundLight
+import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
 
@@ -83,51 +84,41 @@ private fun MainView(
     viewState: DashboardUiState,
     onAction: (DashboardAction) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.background(
-            brush = Brush.verticalGradient(
-                listOf(
-                    BackgroundLight,
-                    BackgroundDark
-                )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .paint(
+                painterResource(id = R.drawable.dashboard_background),
+                contentScale = ContentScale.FillBounds,
             )
-        )
     ) {
-        Column(
+        Image(
+            painter = painterResource(id = R.drawable.company_logo),
+            contentDescription = "",
             modifier = Modifier
-                .fillMaxSize()
-                .paint(
-                    painterResource(id = R.drawable.dashboard_background),
-                    contentScale = ContentScale.FillBounds,
+                .aspectRatio(20f / 6f)
+                .padding(top = spaceXXS),
+            alignment = Alignment.TopCenter
+        )
+
+        when (viewState) {
+            is DashboardUiState.Loading -> {
+                Loader()
+            }
+
+            is DashboardUiState.CarSelectedState -> {
+                CarDetailView(viewState.car, onAction)
+            }
+
+            else -> {
+                AddButton(
+                    modifier = Modifier.weight(1f),
+                    onButtonClick = { onAction(DashboardAction.AddButtonClicked) }
                 )
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.company_logo),
-                contentDescription = "",
-                modifier = Modifier
-                    .aspectRatio(20f / 6f)
-                    .padding(top = spaceXXS),
-                alignment = Alignment.TopCenter
-            )
-
-            when (viewState) {
-                is DashboardUiState.Loading -> {
-                    Loader()
-                }
-
-                is DashboardUiState.CarSelectedState -> {
-                    CarDetailView(viewState.car, onAction)
-                }
-
-                else -> {
-                    AddButton(
-                        modifier = Modifier.weight(1f),
-                        onButtonClick = { onAction(DashboardAction.AddButtonClicked) }
-                    )
-                }
             }
         }
     }
+
 }
 
 @Composable
@@ -276,16 +267,18 @@ private fun DashboardWithNoSelectionPreview() {
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    MainView(
-        DashboardUiState.CarSelectedState(
-            SelectedCar(
-                null,
-                "BMW",
-                "3 series",
-                2018,
-                FuelType.Diesel,
-                listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
+    CarlyDemoTheme {
+        MainView(
+            DashboardUiState.CarSelectedState(
+                SelectedCar(
+                    null,
+                    "BMW",
+                    "3 series",
+                    2018,
+                    FuelType.Diesel,
+                    listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
+                )
             )
-        )
-    ) {}
+        ) {}
+    }
 }

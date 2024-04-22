@@ -2,13 +2,10 @@ package com.example.ui.carlist
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,13 +23,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
@@ -45,12 +39,10 @@ import com.example.ui.common.spaceL
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
 import com.example.ui.theme.BackgroundDark
-import com.example.ui.theme.BackgroundLight
-import com.example.ui.theme.FontDark
+import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
 import com.example.ui.theme.primaryColor
-import com.example.ui.theme.sfProTextFont
 
 @Composable
 internal fun CarListScreen(
@@ -89,50 +81,38 @@ private fun MainView(
     onAction: (CarListAction) -> Unit,
 ) {
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 stringResource(id = R.string.car_list_screen_top_bar_text),
                 onBackPress = { onAction(CarListAction.UpPressed) })
         }
     ) { contentPadding ->
-        Box(
+
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            BackgroundLight,
-                            BackgroundDark
-                        )
-                    )
-                )
-                .padding(contentPadding)
+                .padding(contentPadding),
+            // .padding(top = spaceS),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(top = spaceS),
-                verticalArrangement = Arrangement.SpaceBetween
+            CarListView(
+                modifier = Modifier.weight(1f),
+                viewState.selectedCars,
+                onAction
+            )
+            Row(
+                modifier = Modifier.weight(0.12f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-
-                CarListView(
-                    modifier = Modifier.weight(1f),
-                    viewState.selectedCars,
-                    onAction
+                AddNewCarButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = spaceL, end = spaceL),
+                    onClick = navigateToCarSelection
                 )
-                Row(
-                    modifier = Modifier.weight(0.12f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    AddNewCarButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = spaceL, end = spaceL),
-                        onClick = navigateToCarSelection
-                    )
-                }
             }
         }
     }
@@ -231,31 +211,33 @@ private fun CarItemView(
 @Preview
 @Composable
 private fun CarListPreview() {
-    MainView(
-        CarListUiState.SelectedCars(
-            listOf(
-                SelectedCar(
-                    brand = "BMW",
-                    series = "3 series",
-                    buildYear = 2018,
-                    fuelType = FuelType.Diesel,
-                    features = emptyList()
-                ),
-                SelectedCar(
-                    brand = "Audi",
-                    series = "A4",
-                    buildYear = 2007,
-                    fuelType = FuelType.Gasoline,
-                    features = emptyList(),
-                    isMain = true
-                ),
-                SelectedCar(
-                    brand = "Mercedes",
-                    series = "C class",
-                    buildYear = 2008,
-                    fuelType = FuelType.Electric,
-                    features = emptyList()
-                ),
-            )
-        ), {}, {})
+    CarlyDemoTheme {
+        MainView(
+            CarListUiState.SelectedCars(
+                listOf(
+                    SelectedCar(
+                        brand = "BMW",
+                        series = "3 series",
+                        buildYear = 2018,
+                        fuelType = FuelType.Diesel,
+                        features = emptyList()
+                    ),
+                    SelectedCar(
+                        brand = "Audi",
+                        series = "A4",
+                        buildYear = 2007,
+                        fuelType = FuelType.Gasoline,
+                        features = emptyList(),
+                        isMain = true
+                    ),
+                    SelectedCar(
+                        brand = "Mercedes",
+                        series = "C class",
+                        buildYear = 2008,
+                        fuelType = FuelType.Electric,
+                        features = emptyList()
+                    ),
+                )
+            ), {}, {})
+    }
 }
