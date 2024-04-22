@@ -82,6 +82,7 @@ internal class CarListViewModelTest {
                 subject.onAction(CarListAction.UpPressed)
                 val result = awaitItem()
                 result shouldBe CarListUiEvent.goBack
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -92,6 +93,7 @@ internal class CarListViewModelTest {
                 subject.onAction(CarListAction.AddButtonClicked)
                 val result = awaitItem()
                 result shouldBe CarListUiEvent.NavigateToCarSelection
+                cancelAndIgnoreRemainingEvents()
             }
         }
 }
