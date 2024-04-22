@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.FuelType
 import com.example.ui.R
-import com.example.ui.common.DarkHorizontalDivider
+import com.example.ui.common.DoubleHorizontalDivider
 import com.example.ui.common.ErrorView
 import com.example.ui.common.Loader
 import com.example.ui.common.ProceedIconBox
@@ -149,7 +149,7 @@ private fun MainView(
                         color = primaryColor,
                     )
 
-                    DarkHorizontalDivider()
+                    DoubleHorizontalDivider()
 
                     when (viewState) {
                         CarSelectionUiState.Error -> ErrorView()
@@ -265,7 +265,7 @@ private fun ListView(
                     )
                     ProceedIconBox()
                 }
-                DarkHorizontalDivider()
+                DoubleHorizontalDivider()
             }
         }
     }
