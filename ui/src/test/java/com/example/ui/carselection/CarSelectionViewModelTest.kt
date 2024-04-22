@@ -47,12 +47,15 @@ internal class CarSelectionViewModelTest {
             listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
 
         subject.viewState.test {
+            var uiEventCount = 0
+
             // initial brand select state
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(brandsFromFakeCars)
 
             // after brand selection
             subject.onAction(CarSelectionAction.OnBrandSelected(brandAudi))
             awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandAudi, seriesForAudiBrand)
+            uiEventCount++
 
             // after series selection
             subject.onAction(CarSelectionAction.OnSeriesSelected(seriesA1))
@@ -61,6 +64,7 @@ internal class CarSelectionViewModelTest {
                 seriesA1,
                 buildYearListForA1Audi
             )
+            uiEventCount++
 
             //after build year selection
             subject.onAction(CarSelectionAction.OnBuildYearSelected(modelYear1998))
@@ -70,11 +74,13 @@ internal class CarSelectionViewModelTest {
                 modelYear1998,
                 FuelType.getList()
             )
+            uiEventCount++
 
             //after fuel type selection
             subject.onAction(CarSelectionAction.OnFuelTypeSelected(fuelTypeDiesel))
 
             subject.events.test {
+                skipItems(uiEventCount) // skip header text events
                 awaitItem() shouldBe CarSelectionUiEvent.NavigateToDashboard
             }
 
@@ -94,7 +100,7 @@ internal class CarSelectionViewModelTest {
     }
 
     @Test
-    fun `vie state should be updated on up press action`() = runTest {
+    fun `view state should be updated on up press action`() = runTest {
         val brandAudi = "audi"
         val seriesA1 = "a1"
         val modelYear1998 = "1998"
@@ -104,13 +110,14 @@ internal class CarSelectionViewModelTest {
             listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
 
         subject.viewState.test {
-
+            var uiEventCount = 0
             // initial brand select state
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(brandsFromFakeCars)
 
             // after brand selection
             subject.onAction(CarSelectionAction.OnBrandSelected(brandAudi))
             awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandAudi, seriesForAudiBrand)
+            uiEventCount++
 
             // after series selection
             subject.onAction(CarSelectionAction.OnSeriesSelected(seriesA1))
@@ -119,16 +126,17 @@ internal class CarSelectionViewModelTest {
                 seriesA1,
                 buildYearListForA1Audi
             )
+            uiEventCount++
 
             //after build year selection
             subject.onAction(CarSelectionAction.OnBuildYearSelected(modelYear1998))
-            val stateAfterBuildYearSelection = awaitItem()
-            stateAfterBuildYearSelection shouldBe CarSelectionUiState.FuelTypeSelection(
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
                 brandAudi,
                 seriesA1,
                 modelYear1998,
                 FuelType.getList()
             )
+            uiEventCount++
 
             // up press on fuel type selection state
             subject.onAction(CarSelectionAction.UpPressed)
@@ -138,26 +146,30 @@ internal class CarSelectionViewModelTest {
                 seriesA1,
                 buildYearListForA1Audi
             )
+            uiEventCount++
 
             // up press on build year selection
             subject.onAction(CarSelectionAction.UpPressed)
-            val stateAfterBackPressedOnBuildYearSelection = awaitItem()
-            stateAfterBackPressedOnBuildYearSelection shouldBe CarSelectionUiState.SeriesSelection(
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(
                 brandAudi,
                 seriesForAudiBrand
             )
+            uiEventCount++
 
             // up press on series selection
             subject.onAction(CarSelectionAction.UpPressed)
-            val stateAfterBackPressedOnSeriesSelection = awaitItem()
-            stateAfterBackPressedOnSeriesSelection shouldBe CarSelectionUiState.BrandSelection(
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(
                 brandsFromFakeCars
             )
+            uiEventCount++
+
+            subject.onAction(CarSelectionAction.UpPressed)
 
             // up press on brand selection
             subject.events.test {
-                subject.onAction(CarSelectionAction.UpPressed)
+                skipItems(uiEventCount)
                 awaitItem() shouldBe CarSelectionUiEvent.NavigateBack
+                cancelAndIgnoreRemainingEvents()
             }
 
             cancelAndIgnoreRemainingEvents()
@@ -175,12 +187,14 @@ internal class CarSelectionViewModelTest {
             listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
 
         subject.viewState.test {
+            var uiEventCount = 0
             // initial brand select state
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(brandsFromFakeCars)
 
             // after brand selection
             subject.onAction(CarSelectionAction.OnBrandSelected(brandAudi))
             awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandAudi, seriesForAudiBrand)
+            uiEventCount++
 
             // after series selection
             subject.onAction(CarSelectionAction.OnSeriesSelected(seriesA1))
@@ -189,6 +203,7 @@ internal class CarSelectionViewModelTest {
                 seriesA1,
                 buildYearListForA1Audi
             )
+            uiEventCount++
 
             //after build year selection
             subject.onAction(CarSelectionAction.OnBuildYearSelected(modelYear1998))
@@ -199,6 +214,7 @@ internal class CarSelectionViewModelTest {
                 modelYear1998,
                 FuelType.getList()
             )
+            uiEventCount++
 
             // back press on fuel type selection state
             subject.onAction(CarSelectionAction.OnBackPressed)
@@ -208,6 +224,7 @@ internal class CarSelectionViewModelTest {
                 seriesA1,
                 buildYearListForA1Audi
             )
+            uiEventCount++
 
             // back press on build year selection
             subject.onAction(CarSelectionAction.OnBackPressed)
@@ -216,6 +233,7 @@ internal class CarSelectionViewModelTest {
                 brandAudi,
                 seriesForAudiBrand
             )
+            uiEventCount++
 
             // back press on series selection
             subject.onAction(
@@ -225,12 +243,13 @@ internal class CarSelectionViewModelTest {
             stateAfterBackPressedOnSeriesSelection shouldBe CarSelectionUiState.BrandSelection(
                 brandsFromFakeCars
             )
+            uiEventCount++
+
+            subject.onAction(CarSelectionAction.OnBackPressed)
 
             // back press on brand selection
             subject.events.test {
-                subject.onAction(
-                    CarSelectionAction.OnBackPressed
-                )
+                skipItems(uiEventCount)
                 awaitItem() shouldBe CarSelectionUiEvent.NavigateBack
             }
 
