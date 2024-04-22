@@ -42,6 +42,7 @@ class CarSelectionViewModel @Inject constructor(
 
     private var currentBrandList = listOf<String>()
     private var currentSeriesList = listOf<String>()
+    private var currentYearList = listOf<String>()
     private lateinit var currentCar: Car
 
     private val actions: MutableSharedFlow<CarSelectionAction> =
@@ -121,8 +122,7 @@ class CarSelectionViewModel @Inject constructor(
                     CarSelectionUiState.BuildYearSelection(
                         selectedBrand,
                         selectedSeries,
-                        currentCar.minSupportedYear,
-                        currentCar.maxSupportedYear
+                        currentYearList
                     )
                 }
 
@@ -152,15 +152,13 @@ class CarSelectionViewModel @Inject constructor(
         when (viewState.value) {
             is CarSelectionUiState.SeriesSelection -> {
                 (viewState.value as? CarSelectionUiState.SeriesSelection)?.let {
-                    searchOnSeriesList(it.seriesToSelect, searchText)
+                    searchOnSeriesList(searchText)
                 }
             }
 
             is CarSelectionUiState.BuildYearSelection ->
                 (viewState.value as? CarSelectionUiState.BuildYearSelection)?.let { state ->
                     searchOnBuildYearList(
-                        state.minSupportedYearForSelected,
-                        state.maxSupportedYearForSelected,
                         searchText
                     )
                 }
@@ -170,7 +168,7 @@ class CarSelectionViewModel @Inject constructor(
             }
 
             is CarSelectionUiState.BrandSelection -> (viewState.value as? CarSelectionUiState.BrandSelection)?.let {
-                searchOnBrandList(it.brandsToSelect, searchText)
+                searchOnBrandList(searchText)
             }
 
             else -> {
@@ -179,8 +177,8 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun searchOnSeriesList(seriesList: List<String>, searchText: String) {
-        val matchedList = seriesList.getMatchedList(searchText)
+    private fun searchOnSeriesList(searchText: String) {
+        val matchedList = currentSeriesList.getMatchedList(searchText)
         _viewState.update {
             CarSelectionUiState.SeriesSelection(
                 selectedBrand,
@@ -190,8 +188,6 @@ class CarSelectionViewModel @Inject constructor(
     }
 
     private fun searchOnBuildYearList(
-        currentMinYear: Int?,
-        currentMaxYear: Int?,
         searchText: String
     ) {
         val searchNumber = searchText.toIntOrNull()
@@ -201,27 +197,19 @@ class CarSelectionViewModel @Inject constructor(
                 CarSelectionUiState.BuildYearSelection(
                     selectedBrand,
                     selectedSeries,
-                    null,
-                    null
+                    currentYearList,
                 )
             }
             return
         }
 
-        val currentMin = currentMinYear ?: return
-        val currentMax = currentMaxYear ?: return
-
-        val range = (currentMin..currentMax).map { num ->
-            num.toString()
-        }
-        val matchedList = range.getMatchedList(searchText).map { it.toInt() }
+        val matchedList = currentYearList.getMatchedList(searchText).map { it }
 
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
                 selectedBrand,
                 selectedSeries,
-                matchedList.minOrNull(),
-                matchedList.maxOrNull()
+                matchedList
             )
         }
     }
@@ -239,10 +227,9 @@ class CarSelectionViewModel @Inject constructor(
     }
 
     private fun searchOnBrandList(
-        brandList: List<String>,
         searchText: String
     ) {
-        val matchedList = brandList.getMatchedList(searchText)
+        val matchedList = currentBrandList.getMatchedList(searchText)
         _viewState.update { CarSelectionUiState.BrandSelection(matchedList) }
     }
 
@@ -253,7 +240,6 @@ class CarSelectionViewModel @Inject constructor(
             is CarSelectionUiState.FuelTypeSelection -> updateToSelectYearUiState()
 
             is CarSelectionUiState.BrandSelection -> _events.send(CarSelectionUiEvent.GoBack)
-            CarSelectionUiState.CarSelectionFinished -> _events.send(CarSelectionUiEvent.GoBack)
             CarSelectionUiState.Error -> _events.send(CarSelectionUiEvent.GoBack)
             CarSelectionUiState.Loading -> _events.send(CarSelectionUiEvent.GoBack)
         }
@@ -286,12 +272,14 @@ class CarSelectionViewModel @Inject constructor(
 
     private fun updateToSelectYearUiState() {
         currentCar = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
+        currentYearList =
+            (currentCar.minSupportedYear..currentCar.maxSupportedYear).map { it.toString() }
+
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
                 selectedBrand,
                 selectedSeries,
-                currentCar.minSupportedYear,
-                currentCar.maxSupportedYear
+                currentYearList,
             )
         }
     }
@@ -321,7 +309,7 @@ class CarSelectionViewModel @Inject constructor(
 
         viewModelScope.launch {
             addSelectedCarUseCase.add(selectedCar)
-            _viewState.update { CarSelectionUiState.CarSelectionFinished }
+            _events.send(CarSelectionUiEvent.NavigateToDashboard)
         }
     }
 }

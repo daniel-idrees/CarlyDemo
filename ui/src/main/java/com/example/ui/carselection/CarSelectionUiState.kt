@@ -10,8 +10,7 @@ sealed interface CarSelectionUiState {
     data class BuildYearSelection(
         val selectedBrand: String,
         val selectedSeries: String,
-        val minSupportedYearForSelected: Int?,
-        val maxSupportedYearForSelected: Int?
+        val buildYearsToSelect: List<String>
     ) : CarSelectionUiState
 
     data class FuelTypeSelection(
@@ -20,8 +19,6 @@ sealed interface CarSelectionUiState {
         val selectedModelYear: String,
         val fuelTypes: List<String>
     ) : CarSelectionUiState
-
-    data object CarSelectionFinished : CarSelectionUiState
 
     data object Error: CarSelectionUiState
 

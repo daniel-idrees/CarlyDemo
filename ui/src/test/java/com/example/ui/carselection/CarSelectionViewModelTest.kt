@@ -3,6 +3,7 @@ package com.example.ui.carselection
 import app.cash.turbine.test
 import com.example.domain.model.Car
 import com.example.domain.model.FuelType
+import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.GetCarsUseCase
 import com.example.ui.common.MainDispatcherRule
@@ -13,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 internal class CarSelectionViewModelTest {
     @get:Rule
@@ -24,21 +26,21 @@ internal class CarSelectionViewModelTest {
             series = "x1",
             minSupportedYear = 1990,
             maxSupportedYear = 1998,
-            features = emptyList()
+            features = listOf("Battery Check")
         ),
         Car(
             brand = "audi",
             series = "a1",
             minSupportedYear = 1990,
             maxSupportedYear = 1998,
-            features = emptyList()
+            features = listOf("Diagnostics")
         ),
         Car(
             brand = "audi",
             series = "a2",
             minSupportedYear = 1990,
             maxSupportedYear = 1998,
-            features = emptyList()
+            features = listOf("Live Check")
         )
     )
 
@@ -79,8 +81,7 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                1990,
-                1998
+                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
             )
 
 
@@ -95,7 +96,21 @@ internal class CarSelectionViewModelTest {
 
             //after fuel type selection
             subject.onAction(CarSelectionAction.OnFuelTypeSelected(fuelTypeToSelect))
-            awaitItem() shouldBe CarSelectionUiState.CarSelectionFinished
+
+            subject.events.test {
+                awaitItem() shouldBe CarSelectionUiEvent.NavigateToDashboard
+            }
+
+            verify(addSelectedCarUseCase).add(
+                SelectedCar(
+                    brand = "audi",
+                    series = "a1",
+                    buildYear = 1998,
+                    fuelType = FuelType.Diesel,
+                    features = listOf("Diagnostics"),
+                    isMain = true,
+                )
+            )
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -124,8 +139,7 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                1990,
-                1998
+                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
             )
 
             //after build year selection
@@ -144,8 +158,7 @@ internal class CarSelectionViewModelTest {
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                1990,
-                1998
+                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
             )
 
             // up press on build year selection
@@ -195,8 +208,7 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                1990,
-                1998
+                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
             )
 
             //after build year selection
@@ -215,8 +227,7 @@ internal class CarSelectionViewModelTest {
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                1990,
-                1998
+                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
             )
 
             // back press on build year selection

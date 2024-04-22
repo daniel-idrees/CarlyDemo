@@ -79,7 +79,15 @@ private fun MainView(
     onAction: (CarSelectionAction) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    var text by rememberSaveable { mutableStateOf("") }
+    var searchBarText by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(searchBarText) {
+        if (searchBarText.isEmpty()) {
+            onAction(CarSelectionAction.SearchTextEmpty)
+        } else {
+            onAction(CarSelectionAction.SearchIconClicked(searchBarText))
+        }
+    }
 
     var searchBarHint by rememberSaveable { mutableStateOf("") }
 
@@ -106,18 +114,13 @@ private fun MainView(
                     trailingIcon = {
                         SearchButton {
                             focusManager.clearFocus()
-                            onAction(CarSelectionAction.SearchIconClicked(text))
+                            onAction(CarSelectionAction.SearchIconClicked(searchBarText))
                         }
                     },
-                    value = text,
+                    value = searchBarText,
                     singleLine = true,
                     onValueChange = {
-                        text = it
-                        if (it.isEmpty()) {
-                            onAction(CarSelectionAction.SearchTextEmpty)
-                        } else {
-                            onAction(CarSelectionAction.SearchIconClicked(it))
-                        }
+                        searchBarText = it
                     },
                     textStyle = TextStyle(color = FontDark),
                     label = {
@@ -129,7 +132,6 @@ private fun MainView(
                 )
 
                 when (viewState) {
-                    is CarSelectionUiState.CarSelectionFinished -> onAction(CarSelectionAction.OnSelectionFinished)
                     CarSelectionUiState.Error -> ErrorView()
                     CarSelectionUiState.Loading -> Loader()
                     is CarSelectionUiState.BrandSelection -> {
@@ -139,7 +141,7 @@ private fun MainView(
                             viewState.brandsToSelect,
                             onItemClick = { brand ->
                                 focusManager.clearFocus()
-                                text = ""
+                                searchBarText = ""
                                 onAction(
                                     CarSelectionAction.OnBrandSelected(
                                         brand
@@ -157,7 +159,7 @@ private fun MainView(
                             items = viewState.seriesToSelect,
                             onItemClick = { series ->
                                 focusManager.clearFocus()
-                                text = ""
+                                searchBarText = ""
                                 onAction(
                                     CarSelectionAction.OnSeriesSelected(
                                         series
@@ -170,15 +172,12 @@ private fun MainView(
                     is CarSelectionUiState.BuildYearSelection -> {
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_build_year_text)
-                        val min = viewState.minSupportedYearForSelected ?: return@Column
-                        val max = viewState.maxSupportedYearForSelected ?: return@Column
                         BuildYearSelectionListView(
                             header = viewState.selectedBrand + ", " + viewState.selectedSeries,
-                            minSupportedYear = min,
-                            maxSupportedYear = max,
+                            items = viewState.buildYearsToSelect,
                             onItemClick = { modelYear ->
                                 focusManager.clearFocus()
-                                text = ""
+                                searchBarText = ""
                                 onAction(
                                     CarSelectionAction.OnBuildYearSelected(
                                         modelYear
@@ -196,7 +195,7 @@ private fun MainView(
                             viewState.fuelTypes,
                             onItemClick = { fuelType ->
                                 focusManager.clearFocus()
-                                text = ""
+                                searchBarText = ""
                                 onAction(
                                     CarSelectionAction.OnFuelTypeSelected(
                                         fuelType
@@ -244,14 +243,10 @@ private fun SeriesSelectionListView(
 @Composable
 private fun BuildYearSelectionListView(
     header: String,
-    minSupportedYear: Int,
-    maxSupportedYear: Int,
+    items: List<String>,
     onItemClick: (String) -> Unit
 ) {
-    val yearsList = (minSupportedYear..maxSupportedYear).map { it.toString() }
-    if (yearsList.isNotEmpty()) {
-        ListView(header, yearsList, onItemClick)
-    }
+    ListView(header, items, onItemClick)
 }
 
 
@@ -348,8 +343,7 @@ private fun CarYearSelectionPreview() {
         viewState = CarSelectionUiState.BuildYearSelection(
             selectedBrand = "Bmw",
             selectedSeries = "X1 Series",
-            minSupportedYearForSelected = 2010,
-            maxSupportedYearForSelected = 2023
+            buildYearsToSelect = (1998..2010).map { it.toString() }
         ),
     ) {}
 }
