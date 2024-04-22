@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,14 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.FuelType
 import com.example.ui.R
+import com.example.ui.common.DarkHorizontalDivider
 import com.example.ui.common.ErrorView
-import com.example.ui.common.LightHorizontalDivider
 import com.example.ui.common.Loader
 import com.example.ui.common.ProceedIconBox
 import com.example.ui.common.TopBar
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXXS
 import com.example.ui.theme.BackgroundDark
+import com.example.ui.theme.BackgroundLight
 import com.example.ui.theme.FontDark
 import com.example.ui.theme.primaryColor
 
@@ -106,7 +108,7 @@ private fun MainView(
     ) { contentPadding ->
         Box(
             modifier = Modifier
-                .background(color = BackgroundDark)
+                .background(brush = Brush.verticalGradient(listOf(BackgroundLight, BackgroundDark)))
                 .padding(contentPadding)
         ) {
             Column(
@@ -147,7 +149,7 @@ private fun MainView(
                         color = primaryColor,
                     )
 
-                    LightHorizontalDivider()
+                    DarkHorizontalDivider()
 
                     when (viewState) {
                         CarSelectionUiState.Error -> ErrorView()
@@ -261,15 +263,12 @@ private fun ListView(
                         text = text,
                         color = FontDark
                     )
-
                     ProceedIconBox()
                 }
-
-                LightHorizontalDivider()
+                DarkHorizontalDivider()
             }
         }
     }
-
 }
 
 
@@ -317,8 +316,8 @@ private fun CarYearSelectionPreview() {
     ) {}
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarFuelTypeSelectionPreview() {
     MainView(
