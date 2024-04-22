@@ -34,10 +34,15 @@ class CarSelectionViewModel @Inject constructor(
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private lateinit var carList: List<Car>
+
     private var selectedBrand = ""
     private var selectedSeries = ""
     private var selectedModelYear = ""
     private var selectedFuelType: FuelType? = null
+
+    private var currentBrandList = listOf<String>()
+    private var currentSeriesList = listOf<String>()
+    private lateinit var currentCar: Car
 
     private val actions: MutableSharedFlow<CarSelectionAction> =
         MutableSharedFlow(extraBufferCapacity = 64)
@@ -107,10 +112,36 @@ class CarSelectionViewModel @Inject constructor(
 
     private fun refreshTheList() {
         when (viewState.value) {
-            is CarSelectionUiState.BrandSelection -> updateToSelectBrandUiState()
-            is CarSelectionUiState.BuildYearSelection -> updateToSelectYearUiState()
-            is CarSelectionUiState.FuelTypeSelection -> updateToSelectFuelTypeUiState()
-            is CarSelectionUiState.SeriesSelection -> updateToSelectSeriesUiState()
+            is CarSelectionUiState.BrandSelection -> _viewState.update {
+                CarSelectionUiState.BrandSelection(currentBrandList)
+            }
+
+            is CarSelectionUiState.BuildYearSelection ->
+                _viewState.update {
+                    CarSelectionUiState.BuildYearSelection(
+                        selectedBrand,
+                        selectedSeries,
+                        currentCar.minSupportedYear,
+                        currentCar.maxSupportedYear
+                    )
+                }
+
+            is CarSelectionUiState.FuelTypeSelection -> _viewState.update {
+                CarSelectionUiState.FuelTypeSelection(
+                    selectedBrand,
+                    selectedSeries,
+                    selectedModelYear = selectedModelYear,
+                    FuelType.getList()
+                )
+            }
+
+            is CarSelectionUiState.SeriesSelection -> _viewState.update {
+                CarSelectionUiState.SeriesSelection(
+                    selectedBrand,
+                    currentSeriesList
+                )
+            }
+
             else -> {
                 //no-op
             }
@@ -200,34 +231,36 @@ class CarSelectionViewModel @Inject constructor(
     private fun mapCarsListResultToUiState(cars: List<Car>): CarSelectionUiState =
         if (cars.isNotEmpty()) {
             carList = cars
-            CarSelectionUiState.BrandSelection(cars.getBrands())
+            currentBrandList = cars.getBrands()
+            CarSelectionUiState.BrandSelection(currentBrandList)
         } else {
             CarSelectionUiState.Error
         }
 
     private fun updateToSelectBrandUiState() {
         _viewState.update {
-            CarSelectionUiState.BrandSelection(carList.getBrands())
+            CarSelectionUiState.BrandSelection(currentBrandList)
         }
     }
 
     private fun updateToSelectSeriesUiState() {
+        currentSeriesList = carList.getSeriesForBrand(selectedBrand)
         _viewState.update {
             CarSelectionUiState.SeriesSelection(
                 selectedBrand,
-                carList.getSeriesForBrand(selectedBrand)
+                currentSeriesList
             )
         }
     }
 
     private fun updateToSelectYearUiState() {
-        val car = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
+        currentCar = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
                 selectedBrand,
                 selectedSeries,
-                car.minSupportedYear,
-                car.maxSupportedYear
+                currentCar.minSupportedYear,
+                currentCar.maxSupportedYear
             )
         }
     }
