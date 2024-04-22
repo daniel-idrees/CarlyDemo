@@ -52,8 +52,6 @@ internal fun CarSelectionScreen(
     viewModel: CarSelectionViewModel,
     goBack: () -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
-
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
@@ -62,17 +60,12 @@ internal fun CarSelectionScreen(
                 CarSelectionUiEvent.NavigateToDashboard -> {
                     goBack()
                 }
-
-                CarSelectionUiEvent.NavigateToSearch -> {
-                    focusManager.clearFocus()
-                    //no-op
-                }
             }
         }
     }
 
     BackHandler {
-        viewModel.onAction(CarSelectionAction.OnBackPressed(viewState))
+        viewModel.onAction(CarSelectionAction.OnBackPressed)
     }
 
     MainView(
@@ -86,6 +79,7 @@ private fun MainView(
     viewState: CarSelectionUiState,
     onAction: (CarSelectionAction) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
     var text by rememberSaveable { mutableStateOf("") }
 
     var searchBarHint by rememberSaveable { mutableStateOf("") }
@@ -94,7 +88,7 @@ private fun MainView(
         topBar = {
             TopBar(
                 stringResource(id = R.string.car_selection_screen_top_bar_text),
-                onBackPress = { onAction(CarSelectionAction.UpPressed(viewState)) }
+                onBackPress = { onAction(CarSelectionAction.UpPressed) }
             )
         }
     ) { contentPadding ->
@@ -110,10 +104,22 @@ private fun MainView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = spaceS, end = spaceS),
-                    trailingIcon = { SearchButton { onAction(CarSelectionAction.SearchIconClicked) } },
+                    trailingIcon = {
+                        SearchButton {
+                            focusManager.clearFocus()
+                            onAction(CarSelectionAction.SearchIconClicked(text))
+                        }
+                    },
                     value = text,
                     singleLine = true,
-                    onValueChange = { text = it },
+                    onValueChange = {
+                        text = it
+                        if (it.isEmpty()) {
+                            onAction(CarSelectionAction.SearchTextEmpty)
+                        } else {
+                            onAction(CarSelectionAction.SearchIconClicked(it))
+                        }
+                    },
                     textStyle = TextStyle(color = FontDark),
                     label = {
                         Text(
@@ -133,6 +139,8 @@ private fun MainView(
                         BrandSelectionListView(
                             viewState.brandsToSelect,
                             onItemClick = { brand ->
+                                focusManager.clearFocus()
+                                text = ""
                                 onAction(
                                     CarSelectionAction.OnBrandSelected(
                                         brand
@@ -149,6 +157,8 @@ private fun MainView(
                             header = viewState.selectedBrand,
                             items = viewState.seriesToSelect,
                             onItemClick = { series ->
+                                focusManager.clearFocus()
+                                text = ""
                                 onAction(
                                     CarSelectionAction.OnSeriesSelected(
                                         series
@@ -161,11 +171,15 @@ private fun MainView(
                     is CarSelectionUiState.BuildYearSelection -> {
                         searchBarHint =
                             stringResource(id = R.string.car_selection_screen_search_build_year_text)
+                        val min = viewState.minSupportedYearForSelected ?: return@Column
+                        val max = viewState.maxSupportedYearForSelected ?: return@Column
                         BuildYearSelectionListView(
                             header = viewState.selectedBrand + ", " + viewState.selectedSeries,
-                            minSupportedYear = viewState.minSupportedYearForSelected,
-                            maxSupportedYear = viewState.maxSupportedYearForSelected,
+                            minSupportedYear = min,
+                            maxSupportedYear = max,
                             onItemClick = { modelYear ->
+                                focusManager.clearFocus()
+                                text = ""
                                 onAction(
                                     CarSelectionAction.OnBuildYearSelected(
                                         modelYear
@@ -180,7 +194,10 @@ private fun MainView(
                             stringResource(id = R.string.car_selection_screen_search_model_text)
                         FuelTypeListView(
                             header = viewState.selectedBrand + ", " + viewState.selectedSeries + ", " + viewState.selectedModelYear,
+                            viewState.fuelTypes,
                             onItemClick = { fuelType ->
+                                focusManager.clearFocus()
+                                text = ""
                                 onAction(
                                     CarSelectionAction.OnFuelTypeSelected(
                                         fuelType
@@ -233,16 +250,19 @@ private fun BuildYearSelectionListView(
     onItemClick: (String) -> Unit
 ) {
     val yearsList = (minSupportedYear..maxSupportedYear).map { it.toString() }
-    ListView(header, yearsList, onItemClick)
+    if(yearsList.isNotEmpty()) {
+        ListView(header, yearsList, onItemClick)
+    }
 }
 
 
 @Composable
 private fun FuelTypeListView(
     header: String,
+    fuelTypes: List<String>,
     onItemClick: (String) -> Unit
 ) {
-    ListView(header, FuelType.getList(), onItemClick)
+    ListView(header, fuelTypes, onItemClick)
 }
 
 @Composable
@@ -343,7 +363,8 @@ private fun CarFuelTypeSelectionPreview() {
         viewState = CarSelectionUiState.FuelTypeSelection(
             selectedBrand = "Bmw",
             selectedSeries = "X1 Series",
-            selectedModelYear = "2023"
+            selectedModelYear = "2023",
+            FuelType.getList()
         ),
     ) {}
 }

@@ -73,6 +73,7 @@ class CarSelectionViewModel @Inject constructor(
 
     private suspend fun handleAction(action: CarSelectionAction) {
         when (action) {
+            CarSelectionAction.SearchTextEmpty -> refreshTheList()
             is CarSelectionAction.OnBrandSelected -> {
                 selectedBrand = action.brand
                 updateToSelectSeriesUiState()
@@ -95,14 +96,96 @@ class CarSelectionViewModel @Inject constructor(
 
             CarSelectionAction.OnSelectionFinished -> _events.send(CarSelectionUiEvent.NavigateToDashboard)
 
-            CarSelectionAction.SearchIconClicked -> _events.send(CarSelectionUiEvent.NavigateToSearch)
-            is CarSelectionAction.UpPressed -> handleUpPressAction(action.currentUiState)
-            is CarSelectionAction.OnBackPressed -> handleUpPressAction(action.currentUiState)
+            is CarSelectionAction.SearchIconClicked -> {
+                handleSearchAction(action.searchText)
+            }
+
+            is CarSelectionAction.UpPressed -> handleUpPressAction()
+            is CarSelectionAction.OnBackPressed -> handleUpPressAction()
         }
     }
 
-    private suspend fun handleUpPressAction(currentUiState: CarSelectionUiState) {
-        when (currentUiState) {
+    private fun refreshTheList() {
+        when (viewState.value) {
+            is CarSelectionUiState.BrandSelection -> updateToSelectBrandUiState()
+            is CarSelectionUiState.BuildYearSelection -> updateToSelectYearUiState()
+            is CarSelectionUiState.FuelTypeSelection -> updateToSelectFuelTypeUiState()
+            is CarSelectionUiState.SeriesSelection -> updateToSelectSeriesUiState()
+            else -> {
+                //no-op
+            }
+        }
+    }
+
+    private suspend fun handleSearchAction(searchText: String) {
+        when (viewState.value) {
+            is CarSelectionUiState.SeriesSelection -> {
+                (viewState.value as? CarSelectionUiState.SeriesSelection)?.seriesToSelect?.let {
+                    val matchedList = it.filter { it.startsWith(searchText, true) }
+                    _viewState.emit(CarSelectionUiState.SeriesSelection(selectedBrand, matchedList))
+                }
+            }
+
+            is CarSelectionUiState.BuildYearSelection ->
+                (viewState.value as? CarSelectionUiState.BuildYearSelection)?.let { state ->
+                    val searchNumber = searchText.toIntOrNull()
+
+                    if (searchNumber == null) {
+                        _viewState.emit(
+                            CarSelectionUiState.BuildYearSelection(
+                                selectedBrand,
+                                selectedSeries,
+                                null,
+                                null
+                            )
+                        )
+                        return
+                    }
+
+                    val currentMin = state.minSupportedYearForSelected ?: return
+                    val currentMax = state.maxSupportedYearForSelected ?: return
+
+                    val range = (currentMin..currentMax).map { num ->
+                        num.toString()
+                    }
+                    val matchedList =
+                        range.filter { it.startsWith(searchText, true) }.map { it.toInt() }
+
+                    _viewState.emit(
+                        CarSelectionUiState.BuildYearSelection(
+                            selectedBrand,
+                            selectedSeries,
+                            matchedList.minOrNull(),
+                            matchedList.maxOrNull()
+                        )
+                    )
+                }
+
+            is CarSelectionUiState.FuelTypeSelection -> (viewState.value as? CarSelectionUiState.FuelTypeSelection)?.let {
+                val matchedList = FuelType.getList().filter { it.startsWith(searchText, true) }
+                _viewState.emit(
+                    CarSelectionUiState.FuelTypeSelection(
+                        selectedBrand,
+                        selectedSeries,
+                        selectedModelYear,
+                        matchedList
+                    )
+                )
+            }
+
+            is CarSelectionUiState.BrandSelection -> (viewState.value as? CarSelectionUiState.BrandSelection)?.brandsToSelect?.let {
+                val matchedList = it.filter { it.startsWith(searchText, true) }
+                _viewState.emit(CarSelectionUiState.BrandSelection(matchedList))
+            }
+
+            else -> {
+                //no-op
+            }
+        }
+    }
+
+    private suspend fun handleUpPressAction() {
+        when (viewState.value) {
             is CarSelectionUiState.SeriesSelection -> updateToSelectBrandUiState()
             is CarSelectionUiState.BuildYearSelection -> updateToSelectSeriesUiState()
             is CarSelectionUiState.FuelTypeSelection -> updateToSelectYearUiState()
@@ -154,7 +237,8 @@ class CarSelectionViewModel @Inject constructor(
             CarSelectionUiState.FuelTypeSelection(
                 selectedBrand,
                 selectedSeries,
-                selectedModelYear = selectedModelYear
+                selectedModelYear = selectedModelYear,
+                FuelType.getList()
             )
         }
     }
