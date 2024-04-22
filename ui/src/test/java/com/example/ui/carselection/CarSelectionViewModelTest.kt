@@ -417,4 +417,34 @@ internal class CarSelectionViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `header text should be updated on ui state changes`() = runTest {
+        subject.events.test {
+            // after brand selection
+            subject.onAction(CarSelectionAction.OnBrandSelected("audi"))
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("audi")
+
+            // after series selection
+            subject.onAction(CarSelectionAction.OnSeriesSelected("a1"))
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("audi, a1")
+
+            //after build year selection
+            subject.onAction(CarSelectionAction.OnBuildYearSelected("1998"))
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("audi, a1, 1998")
+
+
+            // back press on fuel type selection state
+            subject.onAction(CarSelectionAction.OnBackPressed)
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("audi, a1")
+
+            // back press on build year selection
+            subject.onAction(CarSelectionAction.OnBackPressed)
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("audi")
+
+            // back press on series selection
+            subject.onAction(CarSelectionAction.OnBackPressed)
+            awaitItem() shouldBe CarSelectionUiEvent.UpdateHeaderText("")
+        }
+    }
 }
