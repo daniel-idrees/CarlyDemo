@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.ui.R
-import com.example.ui.common.DarkHorizontalDivider
+import com.example.ui.common.DoubleHorizontalDivider
 import com.example.ui.common.Loader
 import com.example.ui.common.ProceedIconBox
 import com.example.ui.common.spaceS
@@ -202,23 +202,30 @@ private fun CarDetailView(
 
             ElevatedCard(
                 elevation = CardDefaults.elevatedCardElevation(1.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = BackgroundLight,
-                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = spaceXS)
-            ) {
-                val features = car.features
-                LazyColumn {
-                    items(features.size) { index ->
-                        val feature = features[index]
-                        FeatureListItem(feature, onItemClick = {
-                            onAction(DashboardAction.FeatureItemClicked)
-                        })
 
-                        if (index != features.lastIndex) {
-                            DarkHorizontalDivider()
+            ) {
+                Box(modifier = Modifier.background(
+                    brush = Brush.linearGradient(
+                        listOf(
+                            BackgroundDark,
+                            BackgroundLight,
+                        )
+                    )
+                )) {
+                    val features = car.features
+                    LazyColumn {
+                        items(features.size) { index ->
+                            val feature = features[index]
+                            FeatureListItem(feature, onItemClick = {
+                                onAction(DashboardAction.FeatureItemClicked)
+                            })
+
+                            if (index != features.lastIndex) {
+                                DoubleHorizontalDivider()
+                            }
                         }
                     }
                 }
