@@ -6,6 +6,9 @@ import com.example.core.di.DefaultDispatcher
 import com.example.domain.model.Car
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
+import com.example.domain.model.util.getBrands
+import com.example.domain.model.util.getCarForBrandAndSeries
+import com.example.domain.model.util.getSeriesForBrand
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.GetCarsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -313,14 +316,6 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 }
-
-private fun List<Car>.getBrands(): List<String> = map { it.brand }.distinct()
-
-private fun List<Car>.getSeriesForBrand(brand: String): List<String> =
-    filter { it.brand == brand }.map { it.series }
-
-private fun List<Car>.getCarForBrandAndSeries(brand: String, series: String): Car =
-    first { it.brand == brand && it.series == series }
 
 private fun List<String>.getMatchedList(searchText: String) =
     filter { it.startsWith(searchText, true) }
