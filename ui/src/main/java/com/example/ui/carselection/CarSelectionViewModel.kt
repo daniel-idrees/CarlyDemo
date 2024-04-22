@@ -263,7 +263,8 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun updateToSelectSeriesUiState() {
+    private suspend fun updateToSelectSeriesUiState() {
+        _events.send(CarSelectionUiEvent.UpdateHeaderText(selectedBrand))
         currentSeriesList = carList.getSeriesForBrand(selectedBrand)
         _viewState.update {
             CarSelectionUiState.SeriesSelection(
@@ -273,10 +274,11 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun updateToSelectYearUiState() {
+    private suspend fun updateToSelectYearUiState() {
         currentCar = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
         currentYearList =
             (currentCar.minSupportedYear..currentCar.maxSupportedYear).map { it.toString() }
+        _events.send(CarSelectionUiEvent.UpdateHeaderText("$selectedBrand, $selectedSeries"))
 
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
@@ -287,7 +289,8 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun updateToSelectFuelTypeUiState() {
+    private suspend fun updateToSelectFuelTypeUiState() {
+        _events.send(CarSelectionUiEvent.UpdateHeaderText("$selectedBrand, $selectedSeries, $selectedModelYear"))
         _viewState.update {
             CarSelectionUiState.FuelTypeSelection(
                 selectedBrand,
