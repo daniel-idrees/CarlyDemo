@@ -19,10 +19,23 @@ The car data is retrieved from the csv file and selected cars are stored in the 
 - Jetpack Compose for building UI
 - Junit/Mockito/Kotest for unit testing
 
+#### Demo
+
+Happy flow
+
+https://github.com/daniel-idrees/CarlyDemo/assets/11089763/ec1d7ce6-24ed-4f81-bcea-005e959ba033
+
+Search demo
+
+https://github.com/daniel-idrees/CarlyDemo/assets/11089763/e967e3c2-1bd7-4e24-b626-1833215e0840
+
+
+
 #### Limitations 
 
 - Only Protrait mode works. Landscape mode is not handled.
 - Tablet or wider devices are not handled.
 - Theme configuration can be improved.
+- Dark mode is not handled
 - Errors are catched but not handled on UI.
 - Loading state is not handled on UI
