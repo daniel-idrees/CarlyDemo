@@ -40,7 +40,7 @@ import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
-import com.example.ui.theme.primaryColor
+import com.example.ui.theme.OrangeColor
 
 @Composable
 internal fun CarListScreen(
@@ -134,7 +134,7 @@ private fun CarListView(
 private fun AddNewCarButton(modifier: Modifier, onClick: () -> Unit) {
     Button(
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+        colors = ButtonDefaults.buttonColors(containerColor = OrangeColor),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
         onClick = onClick
     ) {
@@ -159,7 +159,7 @@ private fun CarItemView(
                 onCardClick(car.id)
             },
         colors = CardDefaults.cardColors(containerColor = BackgroundDark),
-        border = if (car.isMain) BorderStroke(1.dp, color = primaryColor) else null
+        border = if (car.isMain) BorderStroke(1.dp, color = OrangeColor) else null
     ) {
         Column(
             modifier = Modifier.padding(vertical = spaceXS, horizontal = spaceS),

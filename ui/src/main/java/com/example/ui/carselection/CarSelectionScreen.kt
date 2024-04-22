@@ -43,7 +43,7 @@ import com.example.ui.common.spaceXXS
 import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontDark
 import com.example.ui.theme.MyTypography
-import com.example.ui.theme.primaryColor
+import com.example.ui.theme.OrangeColor
 
 @Composable
 internal fun CarSelectionScreen(
@@ -139,7 +139,7 @@ private fun MainView(
                 Text(
                     text = headerText,
                     modifier = Modifier.padding(horizontal = spaceS, vertical = spaceXXS),
-                    color = primaryColor,
+                    color = OrangeColor,
                     style = MyTypography.bodyMedium
                 )
 
