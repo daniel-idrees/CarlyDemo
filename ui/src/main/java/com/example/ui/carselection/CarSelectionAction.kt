@@ -3,7 +3,7 @@ package com.example.ui.carselection
 
 sealed interface CarSelectionAction {
 
-    data class SearchIconClicked(val searchText: String) : CarSelectionAction
+    data class SearchAction(val searchText: String) : CarSelectionAction
     data object SearchTextEmpty : CarSelectionAction
     data object OnBackPressed : CarSelectionAction
     data object UpPressed : CarSelectionAction

@@ -85,7 +85,7 @@ private fun MainView(
         if (searchBarText.isEmpty()) {
             onAction(CarSelectionAction.SearchTextEmpty)
         } else {
-            onAction(CarSelectionAction.SearchIconClicked(searchBarText))
+            onAction(CarSelectionAction.SearchAction(searchBarText))
         }
     }
 
@@ -114,7 +114,7 @@ private fun MainView(
                     trailingIcon = {
                         SearchButton {
                             focusManager.clearFocus()
-                            onAction(CarSelectionAction.SearchIconClicked(searchBarText))
+                            onAction(CarSelectionAction.SearchAction(searchBarText))
                         }
                     },
                     value = searchBarText,

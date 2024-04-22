@@ -80,6 +80,7 @@ class CarSelectionViewModel @Inject constructor(
     private suspend fun handleAction(action: CarSelectionAction) {
         when (action) {
             CarSelectionAction.SearchTextEmpty -> refreshTheList()
+
             is CarSelectionAction.OnBrandSelected -> {
                 selectedBrand = action.brand
                 updateToSelectSeriesUiState()
@@ -102,7 +103,7 @@ class CarSelectionViewModel @Inject constructor(
 
             CarSelectionAction.OnSelectionFinished -> _events.send(CarSelectionUiEvent.NavigateToDashboard)
 
-            is CarSelectionAction.SearchIconClicked -> {
+            is CarSelectionAction.SearchAction -> {
                 handleSearchAction(action.searchText)
             }
 
@@ -157,7 +158,7 @@ class CarSelectionViewModel @Inject constructor(
             }
 
             is CarSelectionUiState.BuildYearSelection ->
-                (viewState.value as? CarSelectionUiState.BuildYearSelection)?.let { state ->
+                (viewState.value as? CarSelectionUiState.BuildYearSelection)?.let {
                     searchOnBuildYearList(
                         searchText
                     )
@@ -197,14 +198,13 @@ class CarSelectionViewModel @Inject constructor(
                 CarSelectionUiState.BuildYearSelection(
                     selectedBrand,
                     selectedSeries,
-                    currentYearList,
+                    emptyList(),
                 )
             }
             return
         }
 
         val matchedList = currentYearList.getMatchedList(searchText).map { it }
-
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
                 selectedBrand,
