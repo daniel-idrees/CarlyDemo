@@ -2,6 +2,7 @@ package com.example.ui.carselection
 
 import app.cash.turbine.test
 import com.example.domain.model.Car
+import com.example.domain.model.FuelType
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.GetCarsUseCase
 import com.example.ui.common.MainDispatcherRule
@@ -88,7 +89,8 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
                 brandToSelect,
                 seriesToSelect,
-                modelYearToSelect
+                modelYearToSelect,
+                FuelType.getList()
             )
 
             //after fuel type selection
@@ -132,11 +134,12 @@ internal class CarSelectionViewModelTest {
             stateAfterBuildYearSelection shouldBe CarSelectionUiState.FuelTypeSelection(
                 brandToSelect,
                 seriesToSelect,
-                modelYearToSelect
+                modelYearToSelect,
+                FuelType.getList()
             )
 
             // up press on fuel type selection state
-            subject.onAction(CarSelectionAction.UpPressed(stateAfterBuildYearSelection))
+            subject.onAction(CarSelectionAction.UpPressed)
             val stateAfterBackPressed = awaitItem()
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
@@ -146,7 +149,7 @@ internal class CarSelectionViewModelTest {
             )
 
             // up press on build year selection
-            subject.onAction(CarSelectionAction.UpPressed(stateAfterBackPressed))
+            subject.onAction(CarSelectionAction.UpPressed)
             val stateAfterBackPressedOnBuildYearSelection = awaitItem()
             stateAfterBackPressedOnBuildYearSelection shouldBe CarSelectionUiState.SeriesSelection(
                 brandToSelect,
@@ -154,7 +157,7 @@ internal class CarSelectionViewModelTest {
             )
 
             // up press on series selection
-            subject.onAction(CarSelectionAction.UpPressed(stateAfterBackPressedOnBuildYearSelection))
+            subject.onAction(CarSelectionAction.UpPressed)
             val stateAfterBackPressedOnSeriesSelection = awaitItem()
             stateAfterBackPressedOnSeriesSelection shouldBe CarSelectionUiState.BrandSelection(
                 brands
@@ -162,7 +165,7 @@ internal class CarSelectionViewModelTest {
 
             // up press on brand selection
             subject.events.test {
-                subject.onAction(CarSelectionAction.UpPressed(stateAfterBackPressedOnSeriesSelection))
+                subject.onAction(CarSelectionAction.UpPressed)
                 awaitItem() shouldBe CarSelectionUiEvent.GoBack
             }
 
@@ -202,11 +205,12 @@ internal class CarSelectionViewModelTest {
             stateAfterBuildYearSelection shouldBe CarSelectionUiState.FuelTypeSelection(
                 brandToSelect,
                 seriesToSelect,
-                modelYearToSelect
+                modelYearToSelect,
+                FuelType.getList()
             )
 
             // back press on fuel type selection state
-            subject.onAction(CarSelectionAction.OnBackPressed(stateAfterBuildYearSelection))
+            subject.onAction(CarSelectionAction.OnBackPressed)
             val stateAfterBackPressed = awaitItem()
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
@@ -216,7 +220,7 @@ internal class CarSelectionViewModelTest {
             )
 
             // back press on build year selection
-            subject.onAction(CarSelectionAction.OnBackPressed(stateAfterBackPressed))
+            subject.onAction(CarSelectionAction.OnBackPressed)
             val stateAfterBackPressedOnBuildYearSelection = awaitItem()
             stateAfterBackPressedOnBuildYearSelection shouldBe CarSelectionUiState.SeriesSelection(
                 brandToSelect,
@@ -225,9 +229,7 @@ internal class CarSelectionViewModelTest {
 
             // back press on series selection
             subject.onAction(
-                CarSelectionAction.OnBackPressed(
-                    stateAfterBackPressedOnBuildYearSelection
-                )
+                CarSelectionAction.OnBackPressed
             )
             val stateAfterBackPressedOnSeriesSelection = awaitItem()
             stateAfterBackPressedOnSeriesSelection shouldBe CarSelectionUiState.BrandSelection(
@@ -237,9 +239,7 @@ internal class CarSelectionViewModelTest {
             // back press on brand selection
             subject.events.test {
                 subject.onAction(
-                    CarSelectionAction.OnBackPressed(
-                        stateAfterBackPressedOnSeriesSelection
-                    )
+                    CarSelectionAction.OnBackPressed
                 )
                 awaitItem() shouldBe CarSelectionUiEvent.GoBack
             }
@@ -249,10 +249,21 @@ internal class CarSelectionViewModelTest {
     }
 
     @Test
-    fun `search icon click action should invoke navigate to search ui event `() = runTest {
-        subject.events.test {
-            subject.onAction(CarSelectionAction.SearchIconClicked)
-            awaitItem() shouldBe CarSelectionUiEvent.NavigateToSearch
+    fun `search icon click should filter the brand list`() = runTest {
+        val brands = fakeCars.map { it.brand }.distinct()
+        subject.viewState.test {
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            subject.onAction(CarSelectionAction.SearchIconClicked("bm"))
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(listOf("bmw"))
+
+            subject.onAction(CarSelectionAction.SearchIconClicked("bmww"))
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(emptyList())
+
+            subject.onAction(CarSelectionAction.SearchTextEmpty)
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
