@@ -16,14 +16,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +32,7 @@ import com.example.domain.model.SelectedCar
 import com.example.ui.R
 import com.example.ui.common.ErrorView
 import com.example.ui.common.Loader
-import com.example.ui.common.TopBar
+import com.example.ui.common.MyScaffoldWithTopBar
 import com.example.ui.common.spaceL
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
@@ -80,20 +78,15 @@ private fun MainView(
     navigateToCarSelection: () -> Unit,
     onAction: (CarListAction) -> Unit,
 ) {
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            TopBar(
-                stringResource(id = R.string.car_list_screen_top_bar_text),
-                onBackPress = { onAction(CarListAction.UpPressed) })
-        }
+    MyScaffoldWithTopBar(
+        stringResource(id = R.string.car_list_screen_top_bar_text),
+        onUpPress = { onAction(CarListAction.UpPressed) }
     ) { contentPadding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding),
-            // .padding(top = spaceS),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +24,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,8 +36,8 @@ import com.example.ui.R
 import com.example.ui.common.DoubleHorizontalDivider
 import com.example.ui.common.ErrorView
 import com.example.ui.common.Loader
+import com.example.ui.common.MyScaffoldWithTopBar
 import com.example.ui.common.ProceedIconBox
-import com.example.ui.common.TopBar
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXXS
 import com.example.ui.theme.CarlyDemoTheme
@@ -97,17 +95,11 @@ private fun MainView(
     }
 
     var searchBarHint by rememberSaveable { mutableStateOf("") }
-
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            TopBar(
-                stringResource(id = R.string.car_selection_screen_top_bar_text),
-                onBackPress = {
-                    focusManager.clearFocus()
-                    onAction(CarSelectionAction.UpPressed)
-                }
-            )
+    MyScaffoldWithTopBar(
+        stringResource(id = R.string.car_selection_screen_top_bar_text),
+        onUpPress = {
+            focusManager.clearFocus()
+            onAction(CarSelectionAction.UpPressed)
         }
     ) { contentPadding ->
         Column(
@@ -320,8 +312,9 @@ private fun CarFuelTypeSelectionPreview() {
         FuelType.getList()
     ).Preview(headerText = "Bmw, X1 Series, 2023")
 }
+
 @Composable
-private fun CarSelectionUiState.Preview(headerText : String) {
+private fun CarSelectionUiState.Preview(headerText: String) {
     CarlyDemoTheme {
         MainView(viewState = this, headerText = headerText) {
         }
