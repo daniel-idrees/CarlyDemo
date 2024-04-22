@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -83,7 +85,16 @@ private fun MainView(
     viewState: DashboardUiState,
     onAction: (DashboardAction) -> Unit,
 ) {
-    Box(modifier = Modifier.background(color = BackgroundDark)) {
+    Box(
+        modifier = Modifier.background(
+            brush = Brush.verticalGradient(
+                listOf(
+                    BackgroundLight,
+                    BackgroundDark
+                )
+            )
+        )
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +108,7 @@ private fun MainView(
                 contentDescription = "",
                 modifier = Modifier
                     .aspectRatio(20f / 6f)
-                    .padding(top = spaceXS),
+                    .padding(top = spaceXXS),
                 alignment = Alignment.TopCenter
             )
 
@@ -130,7 +141,8 @@ private fun CarDetailView(
         modifier = Modifier
             .padding(spaceS)
             .fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column {
             Row(
@@ -176,9 +188,7 @@ private fun CarDetailView(
             painter = painterResource(id = R.drawable.car_image),
             contentDescription = "Car image",
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = spaceXXS)
-                .size(150.dp),
+                .aspectRatio(20f / 10f),
             alignment = Alignment.Center
         )
 
@@ -197,7 +207,7 @@ private fun CarDetailView(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = spaceS)
+                    .padding(vertical = spaceXS)
             ) {
                 val features = car.features
                 LazyColumn {
@@ -222,7 +232,7 @@ private fun FeatureListItem(text: String, onItemClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = spaceS, vertical = spaceXXS)
+            .padding(horizontal = spaceS, vertical = spaceXS)
             .clickable(onClick = onItemClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -262,16 +272,18 @@ private fun DashboardWithNoSelectionPreview() {
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    MainView(
-        DashboardUiState.CarSelectedState(
-            SelectedCar(
-                null,
-                "BMW",
-                "3 series",
-                2018,
-                FuelType.Diesel,
-                listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
+    MaterialTheme {
+        MainView(
+            DashboardUiState.CarSelectedState(
+                SelectedCar(
+                    null,
+                    "BMW",
+                    "3 series",
+                    2018,
+                    FuelType.Diesel,
+                    listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
+                )
             )
-        )
-    ) {}
+        ) {}
+    }
 }
