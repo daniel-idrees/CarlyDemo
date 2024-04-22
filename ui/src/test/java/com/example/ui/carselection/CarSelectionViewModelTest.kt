@@ -81,9 +81,8 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
             )
-
 
             //after build year selection
             subject.onAction(CarSelectionAction.OnBuildYearSelected(modelYearToSelect))
@@ -139,7 +138,7 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
             )
 
             //after build year selection
@@ -158,7 +157,7 @@ internal class CarSelectionViewModelTest {
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
             )
 
             // up press on build year selection
@@ -208,7 +207,7 @@ internal class CarSelectionViewModelTest {
             awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
             )
 
             //after build year selection
@@ -227,7 +226,7 @@ internal class CarSelectionViewModelTest {
             stateAfterBackPressed shouldBe CarSelectionUiState.BuildYearSelection(
                 brandToSelect,
                 seriesToSelect,
-                listOf("1990","1991","1992","1993","1994","1995","1996","1997","1998")
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
             )
 
             // back press on build year selection
@@ -265,14 +264,178 @@ internal class CarSelectionViewModelTest {
         subject.viewState.test {
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
 
-            subject.onAction(CarSelectionAction.SearchIconClicked("bm"))
+            subject.onAction(CarSelectionAction.SearchAction("bm"))
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(listOf("bmw"))
 
-            subject.onAction(CarSelectionAction.SearchIconClicked("bmww"))
+            subject.onAction(CarSelectionAction.SearchAction("bmww"))
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(emptyList())
 
             subject.onAction(CarSelectionAction.SearchTextEmpty)
             awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search icon click should filter the series list`() = runTest {
+        val brandToSelect = "audi"
+
+        val brands = fakeCars.map { it.brand }.distinct()
+        val series = fakeCars.filter { it.brand == brandToSelect }.map { it.series }
+
+        subject.viewState.test {
+            // initial brand select state
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            // after brand selection
+            subject.onAction(CarSelectionAction.OnBrandSelected(brandToSelect))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, series)
+
+            subject.onAction(CarSelectionAction.SearchAction("a1"))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, listOf("a1"))
+
+            subject.onAction(CarSelectionAction.SearchAction("a11"))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, emptyList())
+
+            subject.onAction(CarSelectionAction.SearchAction("a"))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(
+                brandToSelect,
+                listOf("a1", "a2")
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("a2"))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, listOf("a2"))
+
+            subject.onAction(CarSelectionAction.SearchTextEmpty)
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, series)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search action should filter the year list`() = runTest {
+        val brandToSelect = "audi"
+        val seriesToSelect = "a1"
+
+        val brands = fakeCars.map { it.brand }.distinct()
+        val series = fakeCars.filter { it.brand == brandToSelect }.map { it.series }
+
+        subject.viewState.test {
+            // initial brand select state
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            // after brand selection
+            subject.onAction(CarSelectionAction.OnBrandSelected(brandToSelect))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, series)
+
+            // after series selection
+            subject.onAction(CarSelectionAction.OnSeriesSelected(seriesToSelect))
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("1998"))
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                listOf("1998")
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("19999"))
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                emptyList()
+            )
+
+            subject.onAction(CarSelectionAction.SearchTextEmpty)
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("some text"))
+
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                emptyList()
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `search action should filter the fuel type list`() = runTest {
+        val brandToSelect = "audi"
+        val seriesToSelect = "a1"
+        val modelYearToSelect = "1998"
+
+        val brands = fakeCars.map { it.brand }.distinct()
+        val series = fakeCars.filter { it.brand == brandToSelect }.map { it.series }
+
+        subject.viewState.test {
+            // initial brand select state
+            awaitItem() shouldBe CarSelectionUiState.BrandSelection(brands)
+
+            // after brand selection
+            subject.onAction(CarSelectionAction.OnBrandSelected(brandToSelect))
+            awaitItem() shouldBe CarSelectionUiState.SeriesSelection(brandToSelect, series)
+
+            // after series selection
+            subject.onAction(CarSelectionAction.OnSeriesSelected(seriesToSelect))
+            awaitItem() shouldBe CarSelectionUiState.BuildYearSelection(
+                brandToSelect,
+                seriesToSelect,
+                listOf("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998")
+            )
+
+            //after build year selection
+            subject.onAction(CarSelectionAction.OnBuildYearSelected(modelYearToSelect))
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
+                brandToSelect,
+                seriesToSelect,
+                modelYearToSelect,
+                FuelType.getList()
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("Diesel"))
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
+                brandToSelect,
+                seriesToSelect,
+                modelYearToSelect,
+                listOf("Diesel")
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("Diesel1111"))
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
+                brandToSelect,
+                seriesToSelect,
+                modelYearToSelect,
+                emptyList()
+            )
+
+            subject.onAction(CarSelectionAction.SearchAction("G"))
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
+                brandToSelect,
+                seriesToSelect,
+                modelYearToSelect,
+                listOf("Gasoline")
+            )
+
+            subject.onAction(CarSelectionAction.SearchTextEmpty)
+            awaitItem() shouldBe CarSelectionUiState.FuelTypeSelection(
+                brandToSelect,
+                seriesToSelect,
+                modelYearToSelect,
+                FuelType.getList()
+            )
 
             cancelAndIgnoreRemainingEvents()
         }
