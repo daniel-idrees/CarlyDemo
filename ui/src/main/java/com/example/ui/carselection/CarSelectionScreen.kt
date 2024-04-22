@@ -57,7 +57,7 @@ internal fun CarSelectionScreen(
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
             when (event) {
-                CarSelectionUiEvent.GoBack -> goBack()
+                CarSelectionUiEvent.NavigateBack -> goBack()
                 CarSelectionUiEvent.NavigateToDashboard -> navigateToDashboard()
             }
         }

@@ -242,9 +242,9 @@ class CarSelectionViewModel @Inject constructor(
             is CarSelectionUiState.BuildYearSelection -> updateToSelectSeriesUiState()
             is CarSelectionUiState.FuelTypeSelection -> updateToSelectYearUiState()
 
-            is CarSelectionUiState.BrandSelection -> _events.send(CarSelectionUiEvent.GoBack)
-            CarSelectionUiState.Error -> _events.send(CarSelectionUiEvent.GoBack)
-            CarSelectionUiState.Loading -> _events.send(CarSelectionUiEvent.GoBack)
+            is CarSelectionUiState.BrandSelection -> _events.send(CarSelectionUiEvent.NavigateBack)
+            CarSelectionUiState.Error -> _events.send(CarSelectionUiEvent.NavigateBack)
+            CarSelectionUiState.Loading -> _events.send(CarSelectionUiEvent.NavigateBack)
         }
     }
 

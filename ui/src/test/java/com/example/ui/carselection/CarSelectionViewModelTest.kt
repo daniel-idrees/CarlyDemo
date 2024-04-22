@@ -157,7 +157,7 @@ internal class CarSelectionViewModelTest {
             // up press on brand selection
             subject.events.test {
                 subject.onAction(CarSelectionAction.UpPressed)
-                awaitItem() shouldBe CarSelectionUiEvent.GoBack
+                awaitItem() shouldBe CarSelectionUiEvent.NavigateBack
             }
 
             cancelAndIgnoreRemainingEvents()
@@ -231,7 +231,7 @@ internal class CarSelectionViewModelTest {
                 subject.onAction(
                     CarSelectionAction.OnBackPressed
                 )
-                awaitItem() shouldBe CarSelectionUiEvent.GoBack
+                awaitItem() shouldBe CarSelectionUiEvent.NavigateBack
             }
 
             cancelAndIgnoreRemainingEvents()
