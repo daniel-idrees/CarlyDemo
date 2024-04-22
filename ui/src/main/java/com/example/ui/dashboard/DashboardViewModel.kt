@@ -40,13 +40,13 @@ class DashboardViewModel @Inject constructor(
         getMainSelectedCarUseCase.get()
             .catch { DashboardUiState.NoCarSelectedState }
             .distinctUntilChanged()
-            .filterNotNull()
             .mapLatest { car ->
-                DashboardUiState.CarSelectedState(car)
+                car?.let { DashboardUiState.CarSelectedState(car) }
+                    ?: DashboardUiState.NoCarSelectedState
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5.seconds.inWholeMilliseconds),
-                initialValue = DashboardUiState.NoCarSelectedState
+                initialValue = DashboardUiState.Loading
             )
 
     init {
