@@ -55,6 +55,7 @@ internal fun CarSelectionScreen(
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     var headerText by rememberSaveable { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(viewModel.events) {
         viewModel.events.collect { event ->
@@ -67,6 +68,7 @@ internal fun CarSelectionScreen(
     }
 
     BackHandler {
+        focusManager.clearFocus()
         viewModel.onAction(CarSelectionAction.OnBackPressed)
     }
 
@@ -101,7 +103,10 @@ private fun MainView(
         topBar = {
             TopBar(
                 stringResource(id = R.string.car_selection_screen_top_bar_text),
-                onBackPress = { onAction(CarSelectionAction.UpPressed) }
+                onBackPress = {
+                    focusManager.clearFocus()
+                    onAction(CarSelectionAction.UpPressed)
+                }
             )
         }
     ) { contentPadding ->
