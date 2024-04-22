@@ -273,65 +273,52 @@ private fun ListView(
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarBrandSelectionPreview() {
-    CarlyDemoTheme {
-        MainView(
-            viewState = CarSelectionUiState.BrandSelection(
-                listOf(
-                    "Bmw",
-                    "Audi",
-                    "Mercedes",
-                    "Volkswagen"
-                )
-            ),
-            headerText = ""
-        ) {}
-    }
+    CarSelectionUiState.BrandSelection(
+        listOf(
+            "Bmw",
+            "Audi",
+            "Mercedes",
+            "Volkswagen"
+        )
+    ).Preview(headerText = "")
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarSeriesSelectionPreview() {
-    CarlyDemoTheme {
-        MainView(
-            viewState = CarSelectionUiState.SeriesSelection(
-                selectedBrand = "Bmw",
-                seriesToSelect = listOf("1 Series", "2 Series", "X1 Series", "X2 Series")
-            ),
-            headerText = "Bmw"
-        ) {}
-    }
+    CarSelectionUiState.SeriesSelection(
+        selectedBrand = "Bmw",
+        seriesToSelect = listOf("1 Series", "2 Series", "X1 Series", "X2 Series")
+    ).Preview(headerText = "Bmw")
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarYearSelectionPreview() {
-    CarlyDemoTheme {
-        MainView(
-            viewState = CarSelectionUiState.BuildYearSelection(
-                selectedBrand = "Bmw",
-                selectedSeries = "X1 Series",
-                buildYearsToSelect = (1998..2010).map { it.toString() }
-            ),
-            headerText = "Bmw, X1 Series"
-        ) {}
-    }
+    CarSelectionUiState.BuildYearSelection(
+        selectedBrand = "Bmw",
+        selectedSeries = "X1 Series",
+        buildYearsToSelect = (1998..2010).map { it.toString() }
+    ).Preview(headerText = "Bmw, X1 Series")
 }
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun CarFuelTypeSelectionPreview() {
+    CarSelectionUiState.FuelTypeSelection(
+        selectedBrand = "Bmw",
+        selectedSeries = "X1 Series",
+        selectedModelYear = "2023",
+        FuelType.getList()
+    ).Preview(headerText = "Bmw, X1 Series, 2023")
+}
+@Composable
+private fun CarSelectionUiState.Preview(headerText : String) {
     CarlyDemoTheme {
-        MainView(
-            viewState = CarSelectionUiState.FuelTypeSelection(
-                selectedBrand = "Bmw",
-                selectedSeries = "X1 Series",
-                selectedModelYear = "2023",
-                FuelType.getList()
-            ),
-            headerText = "Bmw, X1 Series, 2023"
-        ) {}
+        MainView(viewState = this, headerText = headerText) {
+        }
     }
 }

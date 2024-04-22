@@ -256,29 +256,32 @@ private fun AddButton(
     )
 }
 
+@Composable
+private fun DashboardUiState.Preview() {
+    CarlyDemoTheme {
+        MainView(this) {}
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithNoSelectionPreview() {
-    MainView(DashboardUiState.NoCarSelectedState) { }
+    DashboardUiState.NoCarSelectedState.Preview()
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    CarlyDemoTheme {
-        MainView(
-            DashboardUiState.CarSelectedState(
-                SelectedCar(
-                    null,
-                    "BMW",
-                    "3 series",
-                    2018,
-                    FuelType.Diesel,
-                    listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
-                )
-            )
-        ) {}
-    }
+    DashboardUiState.CarSelectedState(
+        SelectedCar(
+            null,
+            "BMW",
+            "3 series",
+            2018,
+            FuelType.Diesel,
+            listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
+        )
+    ).Preview()
 }
