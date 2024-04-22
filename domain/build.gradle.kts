@@ -30,4 +30,14 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)
+
+    testImplementation(libs.junit)
+    testImplementation (libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.kotest.runner.junit5)
+    testImplementation (libs.kotest.assertions.core)
+    testImplementation (libs.kotest.property)
+    testImplementation(libs.turbine)
 }
