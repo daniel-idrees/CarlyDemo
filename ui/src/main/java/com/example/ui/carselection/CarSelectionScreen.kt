@@ -47,6 +47,7 @@ import com.example.ui.common.spaceXXS
 import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.BackgroundLight
 import com.example.ui.theme.FontDark
+import com.example.ui.theme.MyTypography
 import com.example.ui.theme.primaryColor
 
 @Composable
@@ -133,7 +134,7 @@ private fun MainView(
                     label = {
                         Text(
                             text = searchBarHint,
-                            color = FontDark
+                            style =  MyTypography.bodyMedium,
                         )
                     },
                 )
@@ -147,6 +148,7 @@ private fun MainView(
                         text = headerText,
                         modifier = Modifier.padding(horizontal = spaceS, vertical = spaceXXS),
                         color = primaryColor,
+                        style =  MyTypography.bodyMedium
                     )
 
                     DoubleHorizontalDivider()
@@ -261,7 +263,7 @@ private fun ListView(
                 ) {
                     Text(
                         text = text,
-                        color = FontDark
+                        style =  MyTypography.bodyMedium
                     )
                     ProceedIconBox()
                 }

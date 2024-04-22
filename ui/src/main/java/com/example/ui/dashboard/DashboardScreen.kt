@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,8 +43,8 @@ import com.example.ui.common.spaceXS
 import com.example.ui.common.spaceXXS
 import com.example.ui.theme.BackgroundDark
 import com.example.ui.theme.BackgroundLight
-import com.example.ui.theme.FontDark
 import com.example.ui.theme.FontLight
+import com.example.ui.theme.MyTypography
 
 @Composable
 internal fun DashboardScreen(
@@ -156,9 +154,9 @@ private fun CarDetailView(
                         car.brand,
                         car.series
                     ),
-                    color = FontLight,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium,
+                    style = MyTypography.titleMedium
                 )
 
                 Image(
@@ -174,14 +172,13 @@ private fun CarDetailView(
             }
 
             Text(
-                modifier = Modifier.padding(top = 2.dp),
+                modifier = Modifier.padding(top = 6.dp),
                 text = stringResource(
                     id = R.string.car_manufactured_year_and_fuel_type_text,
                     car.buildYear,
                     car.fuelType
                 ),
-                color = FontDark,
-                fontSize = 14.sp,
+                style = MyTypography.bodyMedium
             )
         }
         Image(
@@ -197,7 +194,7 @@ private fun CarDetailView(
                 text = stringResource(id = R.string.dashboard_feature_list_header_text),
                 color = FontLight,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
+                style = MyTypography.bodyMedium
             )
 
             ElevatedCard(
@@ -206,14 +203,16 @@ private fun CarDetailView(
                     .padding(vertical = spaceXS)
 
             ) {
-                Box(modifier = Modifier.background(
-                    brush = Brush.linearGradient(
-                        listOf(
-                            BackgroundDark,
-                            BackgroundLight,
+                Box(
+                    modifier = Modifier.background(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                BackgroundDark,
+                                BackgroundLight,
+                            )
                         )
                     )
-                )) {
+                ) {
                     val features = car.features
                     LazyColumn {
                         items(features.size) { index ->
@@ -245,8 +244,7 @@ private fun FeatureListItem(text: String, onItemClick: () -> Unit) {
     ) {
         Text(
             text = text,
-            color = FontDark,
-            fontSize = 14.sp,
+            style = MyTypography.bodyMedium
         )
         ProceedIconBox()
     }
@@ -278,18 +276,16 @@ private fun DashboardWithNoSelectionPreview() {
 @Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DashboardWithCarDetailPreview() {
-    MaterialTheme {
-        MainView(
-            DashboardUiState.CarSelectedState(
-                SelectedCar(
-                    null,
-                    "BMW",
-                    "3 series",
-                    2018,
-                    FuelType.Diesel,
-                    listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
-                )
+    MainView(
+        DashboardUiState.CarSelectedState(
+            SelectedCar(
+                null,
+                "BMW",
+                "3 series",
+                2018,
+                FuelType.Diesel,
+                listOf("Diagnostics", "Live Data", "Battery Check", "Car Check")
             )
-        ) {}
-    }
+        )
+    ) {}
 }
