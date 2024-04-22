@@ -24,14 +24,14 @@ private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    background = BackgroundDark,
+    background = DarkGrey,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = BackgroundLight,
+    background = LightGrey,
 
     /* Other default colors to override
 
@@ -64,7 +64,7 @@ fun CarlyDemoTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = BackgroundLight.toArgb()
+            window.statusBarColor = LightGrey.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
@@ -75,8 +75,8 @@ fun CarlyDemoTheme(
     ) {
         val backgroundBrush = Brush.verticalGradient(
             listOf(
-                BackgroundLight,
-                BackgroundDark
+                LightGrey,
+                DarkGrey
             )
         )
 

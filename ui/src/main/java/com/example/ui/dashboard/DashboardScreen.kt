@@ -41,8 +41,8 @@ import com.example.ui.common.ProceedIconBox
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
 import com.example.ui.common.spaceXXS
-import com.example.ui.theme.BackgroundDark
-import com.example.ui.theme.BackgroundLight
+import com.example.ui.theme.DarkGrey
+import com.example.ui.theme.LightGrey
 import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
@@ -198,8 +198,8 @@ private fun CarDetailView(
                     modifier = Modifier.background(
                         brush = Brush.linearGradient(
                             listOf(
-                                BackgroundDark,
-                                BackgroundLight,
+                                DarkGrey,
+                                LightGrey,
                             )
                         )
                     )

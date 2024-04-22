@@ -41,7 +41,7 @@ import com.example.ui.common.MyScaffoldWithTopBar
 import com.example.ui.common.spaceL
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
-import com.example.ui.theme.BackgroundDark
+import com.example.ui.theme.DarkGrey
 import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
@@ -178,7 +178,7 @@ private fun CarItemView(
             .clickable {
                 onCardClick(car.id)
             },
-        colors = CardDefaults.cardColors(containerColor = BackgroundDark),
+        colors = CardDefaults.cardColors(containerColor = DarkGrey),
         border = if (car.isMain) BorderStroke(1.dp, color = OrangeColor) else null
     ) {
         Column(

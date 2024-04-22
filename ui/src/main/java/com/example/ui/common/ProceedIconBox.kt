@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.BackgroundDark
+import com.example.ui.theme.DarkGrey
 import com.example.ui.theme.FontLight
 
 @Composable
@@ -20,7 +20,7 @@ internal fun ProceedIconBox() {
         modifier = Modifier
             .size(25.dp)
             .clip(CircleShape)
-            .background(BackgroundDark),
+            .background(DarkGrey),
         contentAlignment = Alignment.Center,
     ) {
         Text(
