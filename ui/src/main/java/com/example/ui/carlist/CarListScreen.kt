@@ -101,7 +101,12 @@ private fun MainView(
                 viewState.selectedCars,
                 onAction
             )
-            Row(modifier = Modifier.weight(0.12f)) {
+            Row(
+                modifier = Modifier
+                    .weight(0.12f)
+                    .padding(bottom = spaceXS),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 AddNewCarButton(
                     modifier = Modifier
                         .fillMaxWidth()
