@@ -48,6 +48,8 @@ class CarSelectionViewModel @Inject constructor(
     private var currentYearList = listOf<String>()
     private lateinit var currentCar: Car
 
+    private val headerTextItems = mutableListOf<String>()
+
     private val actions: MutableSharedFlow<CarSelectionAction> =
         MutableSharedFlow(extraBufferCapacity = 64)
 
@@ -78,24 +80,36 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
+    private fun mapCarsListResultToUiState(cars: List<Car>): CarSelectionUiState =
+        if (cars.isNotEmpty()) {
+            carList = cars
+            currentBrandList = cars.getBrands()
+            CarSelectionUiState.BrandSelection(currentBrandList)
+        } else {
+            CarSelectionUiState.Error
+        }
+
     fun onAction(action: CarSelectionAction) = actions.tryEmit(action)
 
     private suspend fun handleAction(action: CarSelectionAction) {
         when (action) {
-            CarSelectionAction.SearchTextEmpty -> refreshTheList()
+            CarSelectionAction.SearchTextEmpty -> updateViewStateWithOriginalList()
 
             is CarSelectionAction.OnBrandSelected -> {
                 selectedBrand = action.brand
+                headerTextItems.add(selectedBrand)
                 updateToSelectSeriesUiState()
             }
 
             is CarSelectionAction.OnSeriesSelected -> {
                 selectedSeries = action.series
+                headerTextItems.add(selectedSeries)
                 updateToSelectYearUiState()
             }
 
             is CarSelectionAction.OnBuildYearSelected -> {
                 selectedModelYear = action.modelYear
+                headerTextItems.add(selectedModelYear)
                 updateToSelectFuelTypeUiState()
             }
 
@@ -115,7 +129,7 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun refreshTheList() {
+    private fun updateViewStateWithOriginalList() {
         when (viewState.value) {
             is CarSelectionUiState.BrandSelection -> _viewState.update {
                 CarSelectionUiState.BrandSelection(currentBrandList)
@@ -162,17 +176,17 @@ class CarSelectionViewModel @Inject constructor(
 
             is CarSelectionUiState.BuildYearSelection ->
                 (viewState.value as? CarSelectionUiState.BuildYearSelection)?.let {
-                    searchOnBuildYearList(
+                    searchActionOnBuildYearList(
                         searchText
                     )
                 }
 
             is CarSelectionUiState.FuelTypeSelection -> (viewState.value as? CarSelectionUiState.FuelTypeSelection)?.let {
-                searchOnFuelTypeList(searchText)
+                searchActionOnFuelTypeList(searchText)
             }
 
             is CarSelectionUiState.BrandSelection -> (viewState.value as? CarSelectionUiState.BrandSelection)?.let {
-                searchOnBrandList(searchText)
+                searchActionOnBrandList(searchText)
             }
 
             else -> {
@@ -191,9 +205,7 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun searchOnBuildYearList(
-        searchText: String
-    ) {
+    private fun searchActionOnBuildYearList(searchText: String) {
         val searchNumber = searchText.toIntOrNull()
 
         if (searchNumber == null) {
@@ -217,7 +229,7 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun searchOnFuelTypeList(searchText: String) {
+    private fun searchActionOnFuelTypeList(searchText: String) {
         val matchedList = FuelType.getList().getMatchedList(searchText)
         _viewState.update {
             CarSelectionUiState.FuelTypeSelection(
@@ -229,14 +241,14 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun searchOnBrandList(
-        searchText: String
-    ) {
+    private fun searchActionOnBrandList(searchText: String) {
         val matchedList = currentBrandList.getMatchedList(searchText)
         _viewState.update { CarSelectionUiState.BrandSelection(matchedList) }
     }
 
     private suspend fun handleUpPressAction() {
+        headerTextItems.removeLastOrNull()
+
         when (viewState.value) {
             is CarSelectionUiState.SeriesSelection -> updateToSelectBrandUiState()
             is CarSelectionUiState.BuildYearSelection -> updateToSelectSeriesUiState()
@@ -248,24 +260,15 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun mapCarsListResultToUiState(cars: List<Car>): CarSelectionUiState =
-        if (cars.isNotEmpty()) {
-            carList = cars
-            currentBrandList = cars.getBrands()
-            CarSelectionUiState.BrandSelection(currentBrandList)
-        } else {
-            CarSelectionUiState.Error
-        }
-
     private suspend fun updateToSelectBrandUiState() {
-        _events.send(CarSelectionUiEvent.UpdateHeaderText(""))
+        sendUpdateHeaderTextEvent()
         _viewState.update {
             CarSelectionUiState.BrandSelection(currentBrandList)
         }
     }
 
     private suspend fun updateToSelectSeriesUiState() {
-        _events.send(CarSelectionUiEvent.UpdateHeaderText(selectedBrand))
+        sendUpdateHeaderTextEvent()
         currentSeriesList = carList.getSeriesForBrand(selectedBrand)
         _viewState.update {
             CarSelectionUiState.SeriesSelection(
@@ -279,7 +282,7 @@ class CarSelectionViewModel @Inject constructor(
         currentCar = carList.getCarForBrandAndSeries(selectedBrand, selectedSeries)
         currentYearList =
             (currentCar.minSupportedYear..currentCar.maxSupportedYear).map { it.toString() }
-        _events.send(CarSelectionUiEvent.UpdateHeaderText("$selectedBrand, $selectedSeries"))
+        sendUpdateHeaderTextEvent()
 
         _viewState.update {
             CarSelectionUiState.BuildYearSelection(
@@ -291,7 +294,7 @@ class CarSelectionViewModel @Inject constructor(
     }
 
     private suspend fun updateToSelectFuelTypeUiState() {
-        _events.send(CarSelectionUiEvent.UpdateHeaderText("$selectedBrand, $selectedSeries, $selectedModelYear"))
+        sendUpdateHeaderTextEvent()
         _viewState.update {
             CarSelectionUiState.FuelTypeSelection(
                 selectedBrand,
@@ -318,6 +321,10 @@ class CarSelectionViewModel @Inject constructor(
             addSelectedCarUseCase.add(selectedCar)
             _events.send(CarSelectionUiEvent.NavigateToDashboard)
         }
+    }
+
+    private suspend fun sendUpdateHeaderTextEvent() {
+        _events.send(CarSelectionUiEvent.UpdateHeaderText(headerTextItems.joinToString(", ")))
     }
 }
 
