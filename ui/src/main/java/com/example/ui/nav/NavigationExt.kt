@@ -54,3 +54,7 @@ internal fun NavController.navigateToCarSelection() {
         },
     )
 }
+
+fun NavController.navigateBackToDashboard() {
+    this.popBackStack(DashboardScreen.route, false)
+}

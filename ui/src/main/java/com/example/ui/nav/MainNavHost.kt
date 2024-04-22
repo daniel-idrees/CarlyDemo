@@ -28,6 +28,7 @@ internal fun MainNavHost() {
         carSelectionScreen {
             CarSelectionScreen(
                 viewModel = hiltViewModel(),
+                navigateToDashboard = navController::navigateBackToDashboard,
                 goBack = navController::navigateUp
             )
         }

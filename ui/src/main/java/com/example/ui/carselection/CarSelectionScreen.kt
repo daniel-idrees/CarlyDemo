@@ -50,6 +50,7 @@ import com.example.ui.theme.primaryColor
 @Composable
 internal fun CarSelectionScreen(
     viewModel: CarSelectionViewModel,
+    navigateToDashboard: () -> Unit,
     goBack: () -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -57,9 +58,7 @@ internal fun CarSelectionScreen(
         viewModel.events.collect { event ->
             when (event) {
                 CarSelectionUiEvent.GoBack -> goBack()
-                CarSelectionUiEvent.NavigateToDashboard -> {
-                    goBack()
-                }
+                CarSelectionUiEvent.NavigateToDashboard -> navigateToDashboard()
             }
         }
     }
@@ -250,7 +249,7 @@ private fun BuildYearSelectionListView(
     onItemClick: (String) -> Unit
 ) {
     val yearsList = (minSupportedYear..maxSupportedYear).map { it.toString() }
-    if(yearsList.isNotEmpty()) {
+    if (yearsList.isNotEmpty()) {
         ListView(header, yearsList, onItemClick)
     }
 }
