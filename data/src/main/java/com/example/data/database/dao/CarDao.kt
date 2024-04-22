@@ -16,7 +16,7 @@ internal interface CarDao {
     fun getCars(): Flow<List<CarEntity>>
 
     @Query("SELECT * FROM car WHERE is_selected_as_main = :isMain")
-    fun getMainSelectedCar(isMain: Boolean = true): Flow<CarEntity>
+    fun getMainSelectedCar(isMain: Boolean = true): Flow<List<CarEntity>>
 
     @Query("UPDATE car SET is_selected_as_main = :isMain WHERE id = :id")
     suspend fun updateCarAsMain(id: Long?, isMain: Boolean = true)
