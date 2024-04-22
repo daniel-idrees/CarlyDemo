@@ -2,6 +2,7 @@ package com.example.ui.carlist
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -22,6 +24,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +46,7 @@ import com.example.ui.theme.CarlyDemoTheme
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
 import com.example.ui.theme.OrangeColor
+import com.example.ui.theme.YellowColor
 
 @Composable
 internal fun CarListScreen(
@@ -95,11 +101,7 @@ private fun MainView(
                 viewState.selectedCars,
                 onAction
             )
-            Row(
-                modifier = Modifier.weight(0.12f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
+            Row(modifier = Modifier.weight(0.12f)) {
                 AddNewCarButton(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -132,16 +134,29 @@ private fun CarListView(
 
 @Composable
 private fun AddNewCarButton(modifier: Modifier, onClick: () -> Unit) {
-    Button(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = OrangeColor),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
-        onClick = onClick
+    Card(
+        modifier = modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(
+                Brush.horizontalGradient(
+                    listOf(
+                        OrangeColor,
+                        YellowColor
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Text(
-            text = stringResource(id = R.string.car_list_screen_add_new_car_button_text),
-            color = FontLight
-        )
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            onClick = onClick
+        ) {
+            Text(
+                text = stringResource(id = R.string.car_list_screen_add_new_car_button_text),
+                color = FontLight
+            )
+        }
     }
 }
 

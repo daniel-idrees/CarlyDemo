@@ -15,5 +15,5 @@ val BackgroundLight = Color(0xFF3B404A)
 val FontLight = Color(0xFFF7F7F7)
 val FontDark = Color(0xFFC2CDDF)
 val OrangeColor = Color(0xFFFB9B0A)
-val SecondaryColor = Color(0xFFFFD600)
+val YellowColor = Color(0xFFFFD600)
 
