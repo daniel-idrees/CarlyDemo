@@ -257,7 +257,8 @@ class CarSelectionViewModel @Inject constructor(
             CarSelectionUiState.Error
         }
 
-    private fun updateToSelectBrandUiState() {
+    private suspend fun updateToSelectBrandUiState() {
+        _events.send(CarSelectionUiEvent.UpdateHeaderText(""))
         _viewState.update {
             CarSelectionUiState.BrandSelection(currentBrandList)
         }
