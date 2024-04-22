@@ -201,7 +201,6 @@ private fun CarDetailView(
             )
 
             ElevatedCard(
-                elevation = CardDefaults.elevatedCardElevation(1.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = spaceXS)
