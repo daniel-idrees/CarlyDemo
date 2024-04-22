@@ -148,12 +148,17 @@ class CarSelectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleSearchAction(searchText: String) {
+    private fun handleSearchAction(searchText: String) {
         when (viewState.value) {
             is CarSelectionUiState.SeriesSelection -> {
                 (viewState.value as? CarSelectionUiState.SeriesSelection)?.seriesToSelect?.let {
                     val matchedList = it.filter { it.startsWith(searchText, true) }
-                    _viewState.emit(CarSelectionUiState.SeriesSelection(selectedBrand, matchedList))
+                    _viewState.update {
+                        CarSelectionUiState.SeriesSelection(
+                            selectedBrand,
+                            matchedList
+                        )
+                    }
                 }
             }
 
@@ -162,14 +167,14 @@ class CarSelectionViewModel @Inject constructor(
                     val searchNumber = searchText.toIntOrNull()
 
                     if (searchNumber == null) {
-                        _viewState.emit(
+                        _viewState.update {
                             CarSelectionUiState.BuildYearSelection(
                                 selectedBrand,
                                 selectedSeries,
                                 null,
                                 null
                             )
-                        )
+                        }
                         return
                     }
 
@@ -182,31 +187,31 @@ class CarSelectionViewModel @Inject constructor(
                     val matchedList =
                         range.filter { it.startsWith(searchText, true) }.map { it.toInt() }
 
-                    _viewState.emit(
+                    _viewState.update {
                         CarSelectionUiState.BuildYearSelection(
                             selectedBrand,
                             selectedSeries,
                             matchedList.minOrNull(),
                             matchedList.maxOrNull()
                         )
-                    )
+                    }
                 }
 
             is CarSelectionUiState.FuelTypeSelection -> (viewState.value as? CarSelectionUiState.FuelTypeSelection)?.let {
                 val matchedList = FuelType.getList().filter { it.startsWith(searchText, true) }
-                _viewState.emit(
+                _viewState.update {
                     CarSelectionUiState.FuelTypeSelection(
                         selectedBrand,
                         selectedSeries,
                         selectedModelYear,
                         matchedList
                     )
-                )
+                }
             }
 
             is CarSelectionUiState.BrandSelection -> (viewState.value as? CarSelectionUiState.BrandSelection)?.brandsToSelect?.let {
                 val matchedList = it.filter { it.startsWith(searchText, true) }
-                _viewState.emit(CarSelectionUiState.BrandSelection(matchedList))
+                _viewState.update { CarSelectionUiState.BrandSelection(matchedList) }
             }
 
             else -> {
