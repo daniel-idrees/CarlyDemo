@@ -1,10 +1,9 @@
 package com.example.ui.dashboard
 
 import app.cash.turbine.test
-import com.example.domain.model.FuelType
-import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.GetMainSelectedCarUseCase
 import com.example.ui.common.MainDispatcherRule
+import com.example.ui.utils.FakeObjects.anySelectedCar
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -34,22 +33,16 @@ internal class DashboardViewModelTest {
 
     @Test
     fun `view state should be selected car state when a car exist in storage`() = runTest {
-        val anySelectedCar = SelectedCar(
-            brand = "BMW",
-            series = "3 series",
-            buildYear = 2018,
-            fuelType = FuelType.Diesel,
-            features = emptyList()
-        )
+        val selectedCar = anySelectedCar
 
         // when
         whenever(getMainSelectedCarUseCase.get()) doReturn
-            flowOf(anySelectedCar)
+            flowOf(selectedCar)
 
         // then
         subject.viewState.test {
             val result = awaitItem()
-            result shouldBe DashboardUiState.CarSelectedState(anySelectedCar)
+            result shouldBe DashboardUiState.CarSelectedState(selectedCar)
             cancelAndIgnoreRemainingEvents()
         }
     }
