@@ -1,7 +1,9 @@
 package com.example.data.di
 
+import com.example.data.repository.SelectedCarRepository
+import com.example.data.repository.SelectedCarDbRepository
 import com.example.data.repository.CarRepository
-import com.example.data.repository.CarRepositoryImpl
+import com.example.data.repository.CarCSVRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +17,12 @@ internal interface RepositoryModule {
     @Binds
     @Singleton
     fun providesCarRepository(
-        impl: CarRepositoryImpl
+        impl: CarCSVRepository
     ): CarRepository
+
+    @Binds
+    @Singleton
+    fun providesCarDbRepository(
+        impl: SelectedCarDbRepository
+    ): SelectedCarRepository
 }

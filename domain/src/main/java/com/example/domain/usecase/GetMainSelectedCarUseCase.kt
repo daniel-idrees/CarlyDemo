@@ -1,14 +1,14 @@
 package com.example.domain.usecase
 
-import com.example.data.repository.CarRepository
+import com.example.data.repository.SelectedCarRepository
 import com.example.domain.model.mapper.toSelectedCar
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetMainSelectedCarUseCase @Inject constructor(
-    private val carRepository: CarRepository
+    private val repository: SelectedCarRepository
 ) {
-    fun get() = carRepository.getMainSelectedCar().map { entity ->
+    fun get() = repository.getMainSelectedCar().map { entity ->
         entity?.toSelectedCar()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.domain.di
 
+import com.example.data.repository.SelectedCarRepository
 import com.example.data.repository.CarRepository
 import com.example.domain.usecase.AddSelectedCarUseCase
 import com.example.domain.usecase.DeleteSelectedCarUseCase
@@ -27,32 +28,32 @@ internal class UseCaseModule {
     @Provides
     @ViewModelScoped
     fun providesAddSelectedCarUseCase(
-        carRepository: CarRepository,
-    ): AddSelectedCarUseCase = AddSelectedCarUseCase(carRepository)
+        repository: SelectedCarRepository,
+    ): AddSelectedCarUseCase = AddSelectedCarUseCase(repository)
 
     @Provides
     @ViewModelScoped
     fun providesDeleteSelectedCarUseCase(
-        carRepository: CarRepository,
-    ): DeleteSelectedCarUseCase = DeleteSelectedCarUseCase(carRepository)
+        repository: SelectedCarRepository,
+    ): DeleteSelectedCarUseCase = DeleteSelectedCarUseCase(repository)
 
     @Provides
     @ViewModelScoped
     fun providesGetMainSelectedCarUseCase(
-        carRepository: CarRepository,
-    ): GetMainSelectedCarUseCase = GetMainSelectedCarUseCase(carRepository)
+        repository: SelectedCarRepository,
+    ): GetMainSelectedCarUseCase = GetMainSelectedCarUseCase(repository)
 
     @Provides
     @ViewModelScoped
     fun providesGetSelectedCarsUseCase(
-        carRepository: CarRepository,
-    ): GetSelectedCarsUseCase = GetSelectedCarsUseCase(carRepository)
+        repository: SelectedCarRepository,
+    ): GetSelectedCarsUseCase = GetSelectedCarsUseCase(repository)
 
     @Provides
     @ViewModelScoped
     fun providesSetCarAsMainUseCase(
-        carRepository: CarRepository,
-    ): SetCarAsMainUseCase = SetCarAsMainUseCase(carRepository)
+        repository: SelectedCarRepository,
+    ): SetCarAsMainUseCase = SetCarAsMainUseCase(repository)
 
     @Provides
     @ViewModelScoped

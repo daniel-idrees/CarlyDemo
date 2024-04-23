@@ -2,7 +2,7 @@ package com.example.domain.usecase
 
 import app.cash.turbine.test
 import com.example.data.database.entity.CarEntity
-import com.example.data.repository.CarRepository
+import com.example.data.repository.SelectedCarRepository
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.common.MainDispatcherRule
@@ -21,16 +21,16 @@ internal class GetSelectedCarsUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val carRepository: CarRepository = mock()
+    private val repository: SelectedCarRepository = mock()
 
-    private val subject by lazy { GetSelectedCarsUseCase(carRepository) }
+    private val subject by lazy { GetSelectedCarsUseCase(repository) }
 
     @Test
     fun `get emits empty list when carRepository returns empty list`() = runTest {
-        whenever(carRepository.getSelectedCars()) doReturn flowOf(emptyList())
+        whenever(repository.getSelectedCars()) doReturn flowOf(emptyList())
 
         subject.get().test {
-            verify(carRepository).getSelectedCars()
+            verify(repository).getSelectedCars()
             awaitItem() shouldBe emptyList()
             cancelAndIgnoreRemainingEvents()
         }
@@ -38,7 +38,7 @@ internal class GetSelectedCarsUseCaseTest {
 
     @Test
     fun `get emits list of cars when carRepository returns car entity list`() = runTest {
-        whenever(carRepository.getSelectedCars()) doReturn flowOf(
+        whenever(repository.getSelectedCars()) doReturn flowOf(
             listOf(
                 CarEntity(
                     id = 99,
@@ -62,7 +62,7 @@ internal class GetSelectedCarsUseCaseTest {
         )
 
         subject.get().test {
-            verify(carRepository).getSelectedCars()
+            verify(repository).getSelectedCars()
             awaitItem() shouldBe listOf(
                 SelectedCar(
                     id = 99,

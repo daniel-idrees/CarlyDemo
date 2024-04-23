@@ -1,7 +1,7 @@
 package com.example.domain.usecase
 
 import com.example.data.database.entity.CarEntity
-import com.example.data.repository.CarRepository
+import com.example.data.repository.SelectedCarRepository
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.common.MainDispatcherRule
@@ -16,9 +16,9 @@ internal class AddSelectedCarUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val carRepository: CarRepository = mock()
+    private val repository: SelectedCarRepository = mock()
 
-    private val subject by lazy { AddSelectedCarUseCase(carRepository) }
+    private val subject by lazy { AddSelectedCarUseCase(repository) }
 
     @Test
     fun `add should provide the repository with correct car entity of selected car`() = runTest {
@@ -35,7 +35,7 @@ internal class AddSelectedCarUseCaseTest {
             )
         )
 
-        verify(carRepository).addSelectedCar(
+        verify(repository).addSelectedCar(
             CarEntity(
                 id = 99,
                 brandName = "audi",

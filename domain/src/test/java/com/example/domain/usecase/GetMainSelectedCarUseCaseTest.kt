@@ -2,7 +2,7 @@ package com.example.domain.usecase
 
 import app.cash.turbine.test
 import com.example.data.database.entity.CarEntity
-import com.example.data.repository.CarRepository
+import com.example.data.repository.SelectedCarRepository
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.domain.usecase.common.MainDispatcherRule
@@ -21,13 +21,13 @@ internal class GetMainSelectedCarUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val carRepository: CarRepository = mock()
+    private val repository: SelectedCarRepository = mock()
 
-    private val subject by lazy { GetMainSelectedCarUseCase(carRepository) }
+    private val subject by lazy { GetMainSelectedCarUseCase(repository) }
 
     @Test
     fun `get emits main selected car when carRepository returns car entity`() = runTest {
-        whenever(carRepository.getMainSelectedCar()) doReturn flowOf(
+        whenever(repository.getMainSelectedCar()) doReturn flowOf(
             CarEntity(
                 id = 99,
                 brandName = "audi",
@@ -40,7 +40,7 @@ internal class GetMainSelectedCarUseCaseTest {
         )
 
         subject.get().test {
-            verify(carRepository).getMainSelectedCar()
+            verify(repository).getMainSelectedCar()
             awaitItem() shouldBe SelectedCar(
                 id = 99,
                 brand = "audi",
