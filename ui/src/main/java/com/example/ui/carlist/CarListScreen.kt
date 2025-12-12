@@ -27,11 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.domain.model.FuelType
 import com.example.domain.model.SelectedCar
 import com.example.ui.R
@@ -41,27 +44,35 @@ import com.example.ui.common.MyScaffoldWithTopBar
 import com.example.ui.common.spaceL
 import com.example.ui.common.spaceS
 import com.example.ui.common.spaceXS
-import com.example.ui.theme.DarkGrey
 import com.example.ui.theme.CarlyDemoTheme
+import com.example.ui.theme.DarkGrey
 import com.example.ui.theme.FontLight
 import com.example.ui.theme.MyTypography
 import com.example.ui.theme.OrangeColor
 import com.example.ui.theme.YellowColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 internal fun CarListScreen(
     viewModel: CarListViewModel,
     navigateToCarSelection: () -> Unit,
-    goBack: () -> Unit
+    goBack: () -> Unit,
 ) {
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel.events) {
-        viewModel.events.collect { event ->
-            when (event) {
-                CarListUiEvent.NavigateToCarSelection -> navigateToCarSelection()
-                CarListUiEvent.goBack -> goBack()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            withContext(Dispatchers.Main.immediate) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        CarListUiEvent.NavigateToCarSelection -> navigateToCarSelection()
+                        CarListUiEvent.goBack -> goBack()
+                    }
+                }
             }
         }
     }
@@ -122,7 +133,7 @@ private fun MainView(
 private fun CarListView(
     modifier: Modifier,
     selectedCars: List<SelectedCar>,
-    onAction: (CarListAction) -> Unit
+    onAction: (CarListAction) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -169,7 +180,7 @@ private fun AddNewCarButton(modifier: Modifier, onClick: () -> Unit) {
 private fun CarItemView(
     car: SelectedCar,
     onCardClick: (Long?) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier

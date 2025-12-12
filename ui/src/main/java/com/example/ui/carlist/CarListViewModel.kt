@@ -34,7 +34,7 @@ class CarListViewModel @Inject constructor(
     private val actions: MutableSharedFlow<CarListAction> =
         MutableSharedFlow(extraBufferCapacity = 64)
 
-    private val _events = Channel<CarListUiEvent>(capacity = 32)
+    private val _events = Channel<CarListUiEvent>(capacity = Channel.BUFFERED)
     val events: Flow<CarListUiEvent> = _events.receiveAsFlow()
 
     val viewState: StateFlow<CarListUiState> =
